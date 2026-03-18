@@ -2,7 +2,6 @@
 <sdf version="1.5">
   <world name="default">
     <include><uri>model://sun</uri></include>
-    <include><uri>model://ground_plane</uri></include>
     <scene><ambient>0.6 0.6 0.6 1</ambient><shadows>true</shadows></scene>
 
     <model name="thesis_terrain">
@@ -17,10 +16,13 @@
             </heightmap>
           </geometry>
           <surface>
-            <friction><ode><mu>100</mu><mu2>50</mu2></ode></friction>
+            <friction>
+              <ode>
+                <mu>100</mu><mu2>50</mu2>
+              </ode>
+            </friction>
           </surface>
         </collision>
-
         <visual name="visual">
           <geometry>
             <heightmap>
@@ -39,10 +41,9 @@
       </link>
     </model>
 
-
     <model name="start_marker">
       <static>true</static>
-      <pose>6.25 3.515625 2.218 0 0 0</pose>
+      <pose>-19.53125 3.125 4.365 0 0 0</pose>
       <link name="link">
         <visual name="visual">
           <geometry><cylinder><radius>0.4</radius><length>0.5</length></cylinder></geometry>
@@ -50,10 +51,10 @@
         </visual>
       </link>
     </model>
-    
+
     <model name="goal_marker">
       <static>true</static>
-      <pose>-19.921875 -19.921875 3.137 0 0 0</pose>
+      <pose>19.921875 -19.921875 4.837 0 0 0</pose>
       <link name="link">
         <visual name="visual">
           <geometry><cylinder><radius>0.4</radius><length>0.5</length></cylinder></geometry>
@@ -61,120 +62,21 @@
         </visual>
       </link>
     </model>
-    
+
     <model name="road_segment_0">
       <static>true</static>
-      <pose>6.0546875 3.3203125 1.9845000000000002 0 -0.05966547748658422 -2.356194490192345</pose>
+      <pose>-19.3359375 3.3203125 4.1095 0 0.019909495912443863 0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.5534119453445147 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.5525366786467665 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
+
     <model name="road_segment_1">
       <static>true</static>
-      <pose>5.6640625 2.9296875 2.0355 0 -0.12425982229242198 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5567196612748646 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_2">
-      <static>true</static>
-      <pose>5.46875 2.5390625 2.0885 0 -0.09443824307785449 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39237340713279745 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_3">
-      <static>true</static>
-      <pose>5.46875 2.1484375 2.111 0 -0.020477137408829484 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39070691141186636 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_4">
-      <static>true</static>
-      <pose>5.46875 1.7578125 2.124 0 -0.04604742658121812 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39103950008279215 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_5">
-      <static>true</static>
-      <pose>5.46875 1.3671875 2.1335 0 -0.002559994407616375 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39062627999790284 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_6">
-      <static>true</static>
-      <pose>5.46875 0.9765625 2.1445 0 -0.05370829835955131 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3911890727320997 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_7">
-      <static>true</static>
-      <pose>5.2734375 0.5859375 2.129 0 0.09385351132424644 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5548691568739427 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_8">
-      <static>true</static>
-      <pose>4.8828125 0.1953125 2.092 0 0.03980322055452762 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5528650660423391 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_9">
-      <static>true</static>
-      <pose>4.6875 -0.1953125 2.057 0 0.12226706817647846 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39356307070786 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_10">
-      <static>true</static>
-      <pose>4.8828125 -0.5859375 2.0355 0 -0.00905071965960151 -0.7853981633974483</pose>
+      <pose>-18.9453125 3.7109375 4.1065 0 -0.009050719659603117 0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.5524497997555977 0.25 0.05</size></box></geometry>
@@ -182,120 +84,65 @@
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_11">
+
+    <model name="road_segment_2">
       <static>true</static>
-      <pose>5.2734375 -0.9765625 2.0469999999999997 0 -0.032571956705669286 -0.7853981633974483</pose>
+      <pose>-18.5546875 3.90625 4.1419999999999995 0 -0.16737919555388445 0.0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.5527203463325735 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.39616144515209956 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_12">
+
+    <model name="road_segment_3">
       <static>true</static>
-      <pose>5.46875 -1.3671875 2.0505 0 0.028152560048045255 -1.5707963267948966</pose>
+      <pose>-18.1640625 3.90625 4.1835 0 -0.04349255569340595 0.0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.3907798493077656 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.39099474500944387 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_13">
+
+    <model name="road_segment_4">
       <static>true</static>
-      <pose>5.46875 -1.7578125 2.034 0 0.05626056514144097 -1.5707963267948966</pose>
+      <pose>-17.7734375 3.90625 4.2235 0 -0.15990306228996376 0.0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.39124402950716064 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.39567270644435387 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_14">
+
+    <model name="road_segment_5">
       <static>true</static>
-      <pose>5.46875 -2.1484375 2.0115 0 0.05881209839144013 -1.5707963267948966</pose>
+      <pose>-17.3828125 3.90625 4.265999999999999 0 -0.05626056514144154 0.0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.3913015341459831 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.3912440295071607 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_15">
+
+    <model name="road_segment_6">
       <static>true</static>
-      <pose>5.2734375 -2.5390625 1.999 0 0.0036203709020885834 -2.356194490192345</pose>
+      <pose>-16.9921875 3.90625 4.2965 0 -0.09951023414130697 0.0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.5524307931768467 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.39256705239360074 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_16">
+
+    <model name="road_segment_7">
       <static>true</static>
-      <pose>4.8828125 -2.9296875 2.0085 0 -0.037995765438969153 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5528261763429804 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_17">
-      <static>true</static>
-      <pose>4.6875 -3.3203125 2.0255 0 -0.03326772164384809 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39084126013638837 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_18">
-      <static>true</static>
-      <pose>4.4921875 -3.7109375 2.018 0 0.050642077057023796 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5531363134436212 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_19">
-      <static>true</static>
-      <pose>4.296875 -4.1015625 2.013 0 -0.04604742658121812 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39103950008279215 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_20">
-      <static>true</static>
-      <pose>4.296875 -4.4921875 2.0245 0 -0.012799301018044495 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39065699868938736 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_21">
-      <static>true</static>
-      <pose>4.1015625 -4.8828125 2.048 0 -0.07588213924792821 -2.356194490192345</pose>
+      <pose>-16.6015625 3.7109375 4.337 0 -0.0758821392479278 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.5540214628062707 0.25 0.05</size></box></geometry>
@@ -303,153 +150,10 @@
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_22">
+
+    <model name="road_segment_8">
       <static>true</static>
-      <pose>3.7109375 -5.2734375 2.07 0 -0.0036203709020885834 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5524307931768467 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_23">
-      <static>true</static>
-      <pose>3.3203125 -5.6640625 2.0705 0 0.0018101913826277843 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5524280778979287 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_24">
-      <static>true</static>
-      <pose>2.9296875 -6.0546875 2.113 0 -0.1544369866812945 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5590811937903116 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_25">
-      <static>true</static>
-      <pose>2.5390625 -6.4453125 2.2025 0 -0.166784104894442 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5602006615936829 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_26">
-      <static>true</static>
-      <pose>2.34375 -6.8359375 2.2445 0 0.023035924434520825 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3907286662442365 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_27">
-      <static>true</static>
-      <pose>2.1484375 -7.2265625 2.2295 0 0.037995765438969556 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5528261763429804 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_28">
-      <static>true</static>
-      <pose>1.7578125 -7.6171875 2.2159999999999997 0 0.01086073311105564 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5524597553215981 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_29">
-      <static>true</static>
-      <pose>1.3671875 -8.0078125 2.2065 0 0.023528171181801057 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5525801129700562 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_30">
-      <static>true</static>
-      <pose>0.9765625 -8.3984375 2.2315 0 -0.11355160775200596 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.556007896751476 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_31">
-      <static>true</static>
-      <pose>0.5859375 -8.7890625 2.3285 0 -0.23283457384929263 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.567747110296477 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_32">
-      <static>true</static>
-      <pose>0.1953125 -9.1796875 2.388 0 0.021718904659462107 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5525574913527098 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_33">
-      <static>true</static>
-      <pose>-0.1953125 -9.5703125 2.3685 0 0.0488363588994442 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.553086594711895 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_34">
-      <static>true</static>
-      <pose>-0.5859375 -9.765625 2.3485 0 0.03326772164384866 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39084126013638837 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_35">
-      <static>true</static>
-      <pose>-0.9765625 -9.765625 2.343 0 -0.005119955261461012 3.141592653589793</pose>
+      <pose>-16.2109375 3.515625 4.356999999999999 0 0.005119955261460443 0.0</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.39063011996644603 0.25 0.05</size></box></geometry>
@@ -457,87 +161,76 @@
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_36">
+
+    <model name="road_segment_9">
       <static>true</static>
-      <pose>-1.3671875 -9.9609375 2.3289999999999997 0 0.05425251028504476 -2.356194490192345</pose>
+      <pose>-15.8203125 3.515625 4.3565 0 -0.002559994407615238 0.0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.5532411601191655 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.39062627999790284 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_37">
+
+    <model name="road_segment_10">
       <static>true</static>
-      <pose>-1.7578125 -10.3515625 2.331 0 -0.061469037968033026 -2.356194490192345</pose>
+      <pose>-15.4296875 3.3203125 4.3534999999999995 0 0.012670675399833277 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.5534724756028976 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.5524715207592152 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_38">
+
+    <model name="road_segment_11">
       <static>true</static>
-      <pose>-2.1484375 -10.546875 2.3525 0 -0.023035924434521394 3.141592653589793</pose>
+      <pose>-15.0390625 2.9296875 4.3445 0 0.019909495912442256 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.3907286662442366 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.5525366786467665 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_39">
+
+    <model name="road_segment_12">
       <static>true</static>
-      <pose>-2.5390625 -10.7421875 2.35 0 0.025337283652631572 -2.356194490192345</pose>
+      <pose>-14.6484375 2.5390625 4.346499999999999 0 -0.027146230251171927 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.5526045432766546 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.5526307820326335 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_40">
+
+    <model name="road_segment_13">
       <static>true</static>
-      <pose>-2.9296875 -11.1328125 2.3575 0 -0.05244746474390113 -2.356194490192345</pose>
+      <pose>-14.2578125 2.1484375 4.376999999999999 0 -0.08307723717183327 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.5531878354139759 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.5543390490034056 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_41">
+
+    <model name="road_segment_14">
       <static>true</static>
-      <pose>-3.3203125 -11.5234375 2.406 0 -0.12247704066436221 -2.356194490192345</pose>
+      <pose>-13.8671875 1.953125 4.382999999999999 0 0.08682118986125743 0.0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.5565966054962966 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.39210188806609947 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_42">
+
+    <model name="road_segment_15">
       <static>true</static>
-      <pose>-3.7109375 -11.9140625 2.4515 0 -0.041610415504591124 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5529057616357421 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_43">
-      <static>true</static>
-      <pose>-4.1015625 -12.3046875 2.4625 0 0.0018101913826281864 -2.356194490192345</pose>
+      <pose>-13.4765625 1.7578125 4.366499999999999 0 -0.0018101913826265785 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.5524280778979287 0.25 0.05</size></box></geometry>
@@ -545,21 +238,10 @@
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_44">
+
+    <model name="road_segment_16">
       <static>true</static>
-      <pose>-4.4921875 -12.6953125 2.4519999999999995 0 0.036188061913733534 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5527890929188093 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_45">
-      <static>true</static>
-      <pose>-4.8828125 -13.0859375 2.4505 0 -0.030763578581275198 -2.356194490192345</pose>
+      <pose>-13.0859375 1.3671875 4.375499999999999 0 -0.030763578581275198 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.552688683844712 0.25 0.05</size></box></geometry>
@@ -567,10 +249,175 @@
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_46">
+
+    <model name="road_segment_17">
       <static>true</static>
-      <pose>-5.2734375 -13.4765625 2.4845 0 -0.09205891508113227 -2.356194490192345</pose>
+      <pose>-12.6953125 0.9765625 4.4025 0 -0.06687727120419604 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5536648636585132 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_18">
+      <static>true</static>
+      <pose>-12.3046875 0.78125 4.403499999999999 0 0.08936137400761462 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3921898655307146 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_19">
+      <static>true</static>
+      <pose>-11.9140625 0.78125 4.3885 0 -0.01279930101804677 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39065699868938736 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_20">
+      <static>true</static>
+      <pose>-11.5234375 0.9765625 4.384 0 0.025337283652631975 0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5526045432766546 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_21">
+      <static>true</static>
+      <pose>-11.1328125 1.171875 4.3885 0 -0.05881209839143956 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3913015341459831 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_22">
+      <static>true</static>
+      <pose>-10.7421875 0.9765625 4.3965 0 0.012670675399833277 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524715207592152 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_23">
+      <static>true</static>
+      <pose>-10.546875 0.5859375 4.3505 0 0.21425995290691618 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.399766044862492 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_24">
+      <static>true</static>
+      <pose>-10.546875 0.1953125 4.2965 0 0.05881209839143956 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3913015341459831 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_25">
+      <static>true</static>
+      <pose>-10.546875 -0.1953125 4.281 0 0.020477137408831756 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3907069114118664 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_26">
+      <static>true</static>
+      <pose>-10.546875 -0.5859375 4.257 0 0.10204432112926282 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3926676592552536 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_27">
+      <static>true</static>
+      <pose>-10.3515625 -0.9765625 4.179 0 0.20697536602239539 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5644747835377593 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_28">
+      <static>true</static>
+      <pose>-9.9609375 -1.3671875 4.1145 0 0.023528171181801057 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5525801129700562 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_29">
+      <static>true</static>
+      <pose>-9.5703125 -1.7578125 4.0794999999999995 0 0.10281717669615134 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5553600465013665 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_30">
+      <static>true</static>
+      <pose>-9.1796875 -1.953125 4.037 0 0.07155761259469054 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39162723427386914 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_31">
+      <static>true</static>
+      <pose>-8.7890625 -2.1484375 4.01 0 0.04703032195908732 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.553038679705136 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_32">
+      <static>true</static>
+      <pose>-8.3984375 -2.5390625 3.9715000000000003 0 0.09205891508113308 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.5547763344357797 0.25 0.05</size></box></geometry>
@@ -578,406 +425,10 @@
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_47">
+
+    <model name="road_segment_33">
       <static>true</static>
-      <pose>-5.6640625 -13.8671875 2.5185 0 -0.030763578581274396 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.552688683844712 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_48">
-      <static>true</static>
-      <pose>-6.0546875 -14.2578125 2.5215 0 0.01990949591244145 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5525366786467664 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_49">
-      <static>true</static>
-      <pose>-6.25 -14.6484375 2.54 0 -0.12226706817647846 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39356307070786 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_50">
-      <static>true</static>
-      <pose>-6.25 -15.0390625 2.5595 0 0.023035924434521963 -1.5707963267948966</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3907286662442366 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_51">
-      <static>true</static>
-      <pose>-6.4453125 -15.4296875 2.5484999999999998 0 0.023528171181801057 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5525801129700562 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_52">
-      <static>true</static>
-      <pose>-6.8359375 -15.8203125 2.5269999999999997 0 0.05425251028504437 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5532411601191654 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_53">
-      <static>true</static>
-      <pose>-7.2265625 -16.015625 2.5044999999999997 0 0.03838114231326515 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3909128939098837 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_54">
-      <static>true</static>
-      <pose>-7.6171875 -16.2109375 2.504 0 -0.025337283652631975 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5526045432766546 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_55">
-      <static>true</static>
-      <pose>-8.0078125 -16.6015625 2.4975 0 0.048836358899444605 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.553086594711895 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_56">
-      <static>true</static>
-      <pose>-8.3984375 -16.9921875 2.4825 0 0.0054305266956830855 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5524353186120525 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_57">
-      <static>true</static>
-      <pose>-8.7890625 -17.1875 2.47 0 0.056260565141440406 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39124402950716064 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_58">
-      <static>true</static>
-      <pose>-9.1796875 -17.1875 2.462 0 -0.015358792211414682 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39067107728241157 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_59">
-      <static>true</static>
-      <pose>-9.5703125 -17.1875 2.461 0 0.020477137408829484 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39070691141186636 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_60">
-      <static>true</static>
-      <pose>-9.9609375 -17.1875 2.4515 0 0.028152560048045824 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3907798493077656 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_61">
-      <static>true</static>
-      <pose>-10.3515625 -17.3828125 2.4259999999999997 0 0.07228158928706392 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5538734343241243 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_62">
-      <static>true</static>
-      <pose>-10.7421875 -17.7734375 2.395 0 0.039803220554527216 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5528650660423391 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_63">
-      <static>true</static>
-      <pose>-11.1328125 -18.1640625 2.375 0 0.032571956705669286 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5527203463325735 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_64">
-      <static>true</static>
-      <pose>-11.5234375 -18.359375 2.3325 0 0.1698670910138722 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3963292704620742 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_65">
-      <static>true</static>
-      <pose>-11.9140625 -18.359375 2.3005 0 -0.007679849010399124 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3906365198301357 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_66">
-      <static>true</static>
-      <pose>-12.3046875 -18.5546875 2.304 0 -0.007240646901643262 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5524416541590614 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_67">
-      <static>true</static>
-      <pose>-12.6953125 -18.75 2.306 0 -0.0 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.390625 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_68">
-      <static>true</static>
-      <pose>-13.0859375 -18.75 2.2929999999999997 0 0.06646196833413144 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3914893237688609 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_69">
-      <static>true</static>
-      <pose>-13.4765625 -18.75 2.29 0 -0.05115533099458317 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3911366648947654 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_70">
-      <static>true</static>
-      <pose>-13.8671875 -18.75 2.308 0 -0.04093711653858821 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39095254267621793 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_71">
-      <static>true</static>
-      <pose>-14.2578125 -18.75 2.324 0 -0.04093711653858821 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39095254267621793 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_72">
-      <static>true</static>
-      <pose>-14.6484375 -18.5546875 2.334 0 -0.007240646901643262 2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5524416541590614 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_73">
-      <static>true</static>
-      <pose>-15.0390625 -18.359375 2.3369999999999997 0 -0.005119955261461012 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39063011996644603 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_74">
-      <static>true</static>
-      <pose>-15.4296875 -18.5546875 2.339 0 -0.0036203709020885834 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5524307931768467 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_75">
-      <static>true</static>
-      <pose>-15.8203125 -18.75 2.346 0 -0.030710341791771775 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3908092765339636 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_76">
-      <static>true</static>
-      <pose>-16.2109375 -18.9453125 2.388 0 -0.12960336243374226 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5570994356934855 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_77">
-      <static>true</static>
-      <pose>-16.6015625 -19.3359375 2.4435 0 -0.07048060417448267 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5538021138005885 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_78">
-      <static>true</static>
-      <pose>-16.9921875 -19.7265625 2.496 0 -0.11890913984978897 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5563558045441783 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_79">
-      <static>true</static>
-      <pose>-17.3828125 -19.921875 2.557 0 -0.14238981987360225 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.3946186648208622 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_80">
-      <static>true</static>
-      <pose>-17.7734375 -19.921875 2.619 0 -0.1723528650002448 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.39649954681563004 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_81">
-      <static>true</static>
-      <pose>-18.1640625 -20.1171875 2.6555 0 -0.00905071965960151 -2.356194490192345</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.5524497997555977 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_82">
-      <static>true</static>
-      <pose>-18.5546875 -20.3125 2.7064999999999997 0 -0.24339686269862149 3.141592653589793</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.4024883732792787 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-    
-    <model name="road_segment_83">
-      <static>true</static>
-      <pose>-18.9453125 -20.3125 2.7765 0 -0.10963856965928807 3.141592653589793</pose>
+      <pose>-8.0078125 -2.734375 3.9245 0 0.10963856965928807 0.0</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.3929845933684933 0.25 0.05</size></box></geometry>
@@ -985,21 +436,164 @@
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_84">
+
+    <model name="road_segment_34">
       <static>true</static>
-      <pose>-19.3359375 -20.3125 2.7994999999999997 0 -0.007679849010398556 3.141592653589793</pose>
+      <pose>-7.6171875 -2.734375 3.8935 0 0.048601696049966184 0.0</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>0.3906365198301357 0.25 0.05</size></box></geometry>
+          <geometry><box><size>0.3910868070198738 0.25 0.05</size></box></geometry>
           <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
         </visual>
       </link>
     </model>
-    
-    <model name="road_segment_85">
+
+    <model name="road_segment_35">
       <static>true</static>
-      <pose>-19.7265625 -20.1171875 2.844 0 -0.15443698668129488 2.356194490192345</pose>
+      <pose>-7.2265625 -2.734375 3.878 0 0.030710341791770637 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3908092765339635 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_36">
+      <static>true</static>
+      <pose>-6.8359375 -2.734375 3.8615 0 0.05370829835955244 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39118907273209974 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_37">
+      <static>true</static>
+      <pose>-6.4453125 -2.734375 3.8445 0 0.03326772164384809 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39084126013638837 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_38">
+      <static>true</static>
+      <pose>-6.0546875 -2.9296875 3.8165 0 0.07768168114332848 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5540981693256168 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_39">
+      <static>true</static>
+      <pose>-5.6640625 -3.125 3.7880000000000003 0 0.03582466625580039 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39087579948750983 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_40">
+      <static>true</static>
+      <pose>-5.2734375 -3.125 3.769 0 0.061362865217878766 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3913615855254575 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_41">
+      <static>true</static>
+      <pose>-4.8828125 -3.3203125 3.7445 0 0.04522397793632596 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5529925688922049 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_42">
+      <static>true</static>
+      <pose>-4.4921875 -3.7109375 3.718 0 0.050642077057023394 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5531363134436212 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_43">
+      <static>true</static>
+      <pose>-4.296875 -4.1015625 3.713 0 -0.04604742658121755 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39103950008279215 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_44">
+      <static>true</static>
+      <pose>-4.296875 -4.4921875 3.7245 0 -0.012799301018044495 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39065699868938736 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_45">
+      <static>true</static>
+      <pose>-4.1015625 -4.8828125 3.7479999999999998 0 -0.07588213924792861 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5540214628062707 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_46">
+      <static>true</static>
+      <pose>-3.7109375 -5.2734375 3.77 0 -0.0036203709020889855 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524307931768467 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_47">
+      <static>true</static>
+      <pose>-3.3203125 -5.6640625 3.7705 0 0.0018101913826281864 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524280778979287 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_48">
+      <static>true</static>
+      <pose>-2.9296875 -6.0546875 3.813 0 -0.15443698668129488 -0.7853981633974483</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.5590811937903117 0.25 0.05</size></box></geometry>
@@ -1007,9 +601,680 @@
         </visual>
       </link>
     </model>
-    
+
+    <model name="road_segment_49">
+      <static>true</static>
+      <pose>-2.5390625 -6.4453125 3.9025000000000003 0 -0.166784104894442 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5602006615936829 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_50">
+      <static>true</static>
+      <pose>-2.34375 -6.8359375 3.9445 0 0.023035924434521963 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3907286662442366 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_51">
+      <static>true</static>
+      <pose>-2.1484375 -7.2265625 3.9295 0 0.037995765438969153 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5528261763429804 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_52">
+      <static>true</static>
+      <pose>-1.7578125 -7.6171875 3.916 0 0.010860733111056042 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524597553215981 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_53">
+      <static>true</static>
+      <pose>-1.3671875 -8.0078125 3.9065 0 0.023528171181801057 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5525801129700562 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_54">
+      <static>true</static>
+      <pose>-0.9765625 -8.3984375 3.9315 0 -0.11355160775200634 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.556007896751476 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_55">
+      <static>true</static>
+      <pose>-0.5859375 -8.7890625 4.028499999999999 0 -0.23283457384929224 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.567747110296477 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_56">
+      <static>true</static>
+      <pose>-0.1953125 -9.1796875 4.088 0 0.021718904659461302 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5525574913527098 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_57">
+      <static>true</static>
+      <pose>0.1953125 -9.5703125 4.0685 0 0.048836358899444605 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.553086594711895 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_58">
+      <static>true</static>
+      <pose>0.5859375 -9.765625 4.0485 0 0.03326772164384809 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39084126013638837 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_59">
+      <static>true</static>
+      <pose>0.9765625 -9.765625 4.043 0 -0.005119955261460443 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39063011996644603 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_60">
+      <static>true</static>
+      <pose>1.3671875 -9.9609375 4.029 0 0.054252510285045165 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5532411601191655 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_61">
+      <static>true</static>
+      <pose>1.7578125 -10.3515625 4.031 0 -0.06146903796803343 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5534724756028976 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_62">
+      <static>true</static>
+      <pose>2.1484375 -10.546875 4.052499999999999 0 -0.023035924434520825 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3907286662442365 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_63">
+      <static>true</static>
+      <pose>2.5390625 -10.7421875 4.05 0 0.02533728365263117 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5526045432766545 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_64">
+      <static>true</static>
+      <pose>2.9296875 -11.1328125 4.0575 0 -0.05244746474390113 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5531878354139759 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_65">
+      <static>true</static>
+      <pose>3.3203125 -11.5234375 4.106 0 -0.12247704066436221 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5565966054962966 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_66">
+      <static>true</static>
+      <pose>3.7109375 -11.9140625 4.1515 0 -0.04161041550459193 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5529057616357421 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_67">
+      <static>true</static>
+      <pose>4.1015625 -12.3046875 4.1625 0 0.001810191382629794 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524280778979287 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_68">
+      <static>true</static>
+      <pose>4.4921875 -12.6953125 4.151999999999999 0 0.03618806191373273 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5527890929188093 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_69">
+      <static>true</static>
+      <pose>4.8828125 -13.0859375 4.150499999999999 0 -0.030763578581275198 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.552688683844712 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_70">
+      <static>true</static>
+      <pose>5.2734375 -13.4765625 4.1845 0 -0.09205891508113148 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5547763344357796 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_71">
+      <static>true</static>
+      <pose>5.6640625 -13.8671875 4.218499999999999 0 -0.030763578581275198 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.552688683844712 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_72">
+      <static>true</static>
+      <pose>6.0546875 -14.2578125 4.221499999999999 0 0.019909495912442256 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5525366786467665 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_73">
+      <static>true</static>
+      <pose>6.25 -14.6484375 4.239999999999999 0 -0.12226706817647846 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39356307070786 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_74">
+      <static>true</static>
+      <pose>6.25 -15.0390625 4.259499999999999 0 0.023035924434521963 -1.5707963267948966</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3907286662442366 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_75">
+      <static>true</static>
+      <pose>6.4453125 -15.4296875 4.248499999999999 0 0.023528171181801057 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5525801129700562 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_76">
+      <static>true</static>
+      <pose>6.8359375 -15.8203125 4.226999999999999 0 0.05425251028504356 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5532411601191654 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_77">
+      <static>true</static>
+      <pose>7.2265625 -16.015625 4.2044999999999995 0 0.03838114231326628 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39091289390988376 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_78">
+      <static>true</static>
+      <pose>7.6171875 -16.2109375 4.204 0 -0.02533728365263358 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5526045432766546 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_79">
+      <static>true</static>
+      <pose>8.0078125 -16.6015625 4.1975 0 0.04883635889944621 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.553086594711895 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_80">
+      <static>true</static>
+      <pose>8.3984375 -16.9921875 4.182499999999999 0 0.0054305266956830855 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524353186120525 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_81">
+      <static>true</static>
+      <pose>8.7890625 -17.1875 4.17 0 0.05626056514143927 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39124402950716064 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_82">
+      <static>true</static>
+      <pose>9.1796875 -17.1875 4.161999999999999 0 -0.015358792211413546 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39067107728241157 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_83">
+      <static>true</static>
+      <pose>9.5703125 -17.1875 4.161 0 0.02047713740882721 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39070691141186636 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_84">
+      <static>true</static>
+      <pose>9.9609375 -17.1875 4.1514999999999995 0 0.028152560048048097 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39077984930776566 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_85">
+      <static>true</static>
+      <pose>10.3515625 -17.3828125 4.1259999999999994 0 0.07228158928706233 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5538734343241243 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_86">
+      <static>true</static>
+      <pose>10.7421875 -17.7734375 4.095 0 0.039803220554528014 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5528650660423392 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_87">
+      <static>true</static>
+      <pose>11.1328125 -18.1640625 4.075 0 0.032571956705668884 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5527203463325735 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_88">
+      <static>true</static>
+      <pose>11.5234375 -18.359375 4.0325 0 0.16986709101387276 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3963292704620743 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_89">
+      <static>true</static>
+      <pose>11.9140625 -18.359375 4.0005 0 -0.007679849010399692 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3906365198301357 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_90">
+      <static>true</static>
+      <pose>12.3046875 -18.5546875 4.004 0 -0.0072406469016424585 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524416541590614 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_91">
+      <static>true</static>
+      <pose>12.6953125 -18.75 4.005999999999999 0 -0.0 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.390625 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_92">
+      <static>true</static>
+      <pose>13.0859375 -18.75 3.993 0 0.06646196833413087 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3914893237688609 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_93">
+      <static>true</static>
+      <pose>13.4765625 -18.75 3.9899999999999998 0 -0.05115533099458317 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3911366648947654 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_94">
+      <static>true</static>
+      <pose>13.8671875 -18.75 4.008 0 -0.04093711653858821 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39095254267621793 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_95">
+      <static>true</static>
+      <pose>14.2578125 -18.75 4.024 0 -0.04093711653858821 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39095254267621793 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_96">
+      <static>true</static>
+      <pose>14.6484375 -18.5546875 4.034 0 -0.007240646901643262 0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524416541590614 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_97">
+      <static>true</static>
+      <pose>15.0390625 -18.359375 4.037 0 -0.005119955261460443 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39063011996644603 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_98">
+      <static>true</static>
+      <pose>15.4296875 -18.5546875 4.039 0 -0.0036203709020889855 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524307931768467 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_99">
+      <static>true</static>
+      <pose>15.8203125 -18.75 4.045999999999999 0 -0.030710341791771775 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3908092765339636 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_100">
+      <static>true</static>
+      <pose>16.2109375 -18.9453125 4.088 0 -0.12960336243374226 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5570994356934855 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_101">
+      <static>true</static>
+      <pose>16.6015625 -19.3359375 4.1434999999999995 0 -0.07048060417448346 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5538021138005886 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_102">
+      <static>true</static>
+      <pose>16.9921875 -19.7265625 4.196 0 -0.11890913984978739 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5563558045441782 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_103">
+      <static>true</static>
+      <pose>17.3828125 -19.921875 4.257 0 -0.14238981987360447 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39461866482086233 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_104">
+      <static>true</static>
+      <pose>17.7734375 -19.921875 4.319 0 -0.1723528650002437 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.39649954681563 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_105">
+      <static>true</static>
+      <pose>18.1640625 -20.1171875 4.355499999999999 0 -0.00905071965960151 -0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5524497997555977 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_106">
+      <static>true</static>
+      <pose>18.5546875 -20.3125 4.406499999999999 0 -0.24339686269862254 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.40248837327927883 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_107">
+      <static>true</static>
+      <pose>18.9453125 -20.3125 4.4765 0 -0.10963856965928583 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3929845933684932 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_108">
+      <static>true</static>
+      <pose>19.3359375 -20.3125 4.499499999999999 0 -0.007679849010399692 0.0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3906365198301357 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="road_segment_109">
+      <static>true</static>
+      <pose>19.7265625 -20.1171875 4.544 0 -0.15443698668129488 0.7853981633974483</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.5590811937903117 0.25 0.05</size></box></geometry>
+          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+
     <actor name="my_robot">
-      <pose>6.25 3.515625 2.068 0 0 0</pose>
+      <pose>-19.53125 3.125 4.215 0 0 0</pose>
       <link name="link">
         <visual name="visual">
           <geometry><box><size>0.6 0.4 0.2</size></box></geometry>
@@ -1017,97 +1282,457 @@
         </visual>
       </link>
       <script>
-        <loop>true</loop><delay_start>0.0</delay_start><auto_start>true</auto_start>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
         <trajectory id="0" type="driving">
-          <waypoint><time>0.00</time><pose>6.25 3.515625 2.068 0 -0.05966547748658422 -2.356194490192345</pose></waypoint>
-          <waypoint><time>0.51</time><pose>5.859375 3.125 2.101 0 -0.12425982229242198 -2.356194490192345</pose></waypoint>
-          <waypoint><time>1.01</time><pose>5.46875 2.734375 2.17 0 -0.09443824307785449 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>1.52</time><pose>5.46875 2.34375 2.207 0 -0.020477137408829484 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>2.02</time><pose>5.46875 1.953125 2.215 0 -0.04604742658121812 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>2.53</time><pose>5.46875 1.5625 2.233 0 -0.002559994407616375 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>3.03</time><pose>5.46875 1.171875 2.234 0 -0.05370829835955131 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>3.54</time><pose>5.46875 0.78125 2.255 0 0.09385351132424644 -2.356194490192345</pose></waypoint>
-          <waypoint><time>4.05</time><pose>5.078125 0.390625 2.2030000000000003 0 0.03980322055452762 -2.356194490192345</pose></waypoint>
-          <waypoint><time>4.55</time><pose>4.6875 0.0 2.181 0 0.12226706817647846 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>5.06</time><pose>4.6875 -0.390625 2.133 0 -0.00905071965960151 -0.7853981633974483</pose></waypoint>
-          <waypoint><time>5.56</time><pose>5.078125 -0.78125 2.138 0 -0.032571956705669286 -0.7853981633974483</pose></waypoint>
-          <waypoint><time>6.07</time><pose>5.46875 -1.171875 2.1559999999999997 0 0.028152560048045255 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>6.58</time><pose>5.46875 -1.5625 2.145 0 0.05626056514144097 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>7.08</time><pose>5.46875 -1.953125 2.123 0 0.05881209839144013 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>7.59</time><pose>5.46875 -2.34375 2.1 0 0.0036203709020885834 -2.356194490192345</pose></waypoint>
-          <waypoint><time>8.09</time><pose>5.078125 -2.734375 2.098 0 -0.037995765438969153 -2.356194490192345</pose></waypoint>
-          <waypoint><time>8.60</time><pose>4.6875 -3.125 2.1189999999999998 0 -0.03326772164384809 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>9.10</time><pose>4.6875 -3.515625 2.1319999999999997 0 0.050642077057023796 -2.356194490192345</pose></waypoint>
-          <waypoint><time>9.61</time><pose>4.296875 -3.90625 2.104 0 -0.04604742658121812 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>10.12</time><pose>4.296875 -4.296875 2.122 0 -0.012799301018044495 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>10.62</time><pose>4.296875 -4.6875 2.127 0 -0.07588213924792821 -2.356194490192345</pose></waypoint>
-          <waypoint><time>11.13</time><pose>3.90625 -5.078125 2.169 0 -0.0036203709020885834 -2.356194490192345</pose></waypoint>
-          <waypoint><time>11.63</time><pose>3.515625 -5.46875 2.1710000000000003 0 0.0018101913826277843 -2.356194490192345</pose></waypoint>
-          <waypoint><time>12.14</time><pose>3.125 -5.859375 2.17 0 -0.1544369866812945 -2.356194490192345</pose></waypoint>
-          <waypoint><time>12.65</time><pose>2.734375 -6.25 2.2560000000000002 0 -0.166784104894442 -2.356194490192345</pose></waypoint>
-          <waypoint><time>13.15</time><pose>2.34375 -6.640625 2.349 0 0.023035924434520825 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>13.66</time><pose>2.34375 -7.03125 2.34 0 0.037995765438969556 -2.356194490192345</pose></waypoint>
-          <waypoint><time>14.16</time><pose>1.953125 -7.421875 2.319 0 0.01086073311105564 -2.356194490192345</pose></waypoint>
-          <waypoint><time>14.67</time><pose>1.5625 -7.8125 2.3129999999999997 0 0.023528171181801057 -2.356194490192345</pose></waypoint>
-          <waypoint><time>15.17</time><pose>1.171875 -8.203125 2.3 0 -0.11355160775200596 -2.356194490192345</pose></waypoint>
-          <waypoint><time>15.68</time><pose>0.78125 -8.59375 2.363 0 -0.23283457384929263 -2.356194490192345</pose></waypoint>
-          <waypoint><time>16.19</time><pose>0.390625 -8.984375 2.4939999999999998 0 0.021718904659462107 -2.356194490192345</pose></waypoint>
-          <waypoint><time>16.69</time><pose>0.0 -9.375 2.482 0 0.0488363588994442 -2.356194490192345</pose></waypoint>
-          <waypoint><time>17.20</time><pose>-0.390625 -9.765625 2.455 0 0.03326772164384866 3.141592653589793</pose></waypoint>
-          <waypoint><time>17.70</time><pose>-0.78125 -9.765625 2.442 0 -0.005119955261461012 3.141592653589793</pose></waypoint>
-          <waypoint><time>18.21</time><pose>-1.171875 -9.765625 2.444 0 0.05425251028504476 -2.356194490192345</pose></waypoint>
-          <waypoint><time>18.72</time><pose>-1.5625 -10.15625 2.4139999999999997 0 -0.061469037968033026 -2.356194490192345</pose></waypoint>
-          <waypoint><time>19.22</time><pose>-1.953125 -10.546875 2.448 0 -0.023035924434521394 3.141592653589793</pose></waypoint>
-          <waypoint><time>19.73</time><pose>-2.34375 -10.546875 2.457 0 0.025337283652631572 -2.356194490192345</pose></waypoint>
-          <waypoint><time>20.23</time><pose>-2.734375 -10.9375 2.443 0 -0.05244746474390113 -2.356194490192345</pose></waypoint>
-          <waypoint><time>20.74</time><pose>-3.125 -11.328125 2.472 0 -0.12247704066436221 -2.356194490192345</pose></waypoint>
-          <waypoint><time>21.24</time><pose>-3.515625 -11.71875 2.54 0 -0.041610415504591124 -2.356194490192345</pose></waypoint>
-          <waypoint><time>21.75</time><pose>-3.90625 -12.109375 2.563 0 0.0018101913826281864 -2.356194490192345</pose></waypoint>
-          <waypoint><time>22.26</time><pose>-4.296875 -12.5 2.562 0 0.036188061913733534 -2.356194490192345</pose></waypoint>
-          <waypoint><time>22.76</time><pose>-4.6875 -12.890625 2.542 0 -0.030763578581275198 -2.356194490192345</pose></waypoint>
-          <waypoint><time>23.27</time><pose>-5.078125 -13.28125 2.559 0 -0.09205891508113227 -2.356194490192345</pose></waypoint>
-          <waypoint><time>23.77</time><pose>-5.46875 -13.671875 2.61 0 -0.030763578581274396 -2.356194490192345</pose></waypoint>
-          <waypoint><time>24.28</time><pose>-5.859375 -14.0625 2.627 0 0.01990949591244145 -2.356194490192345</pose></waypoint>
-          <waypoint><time>24.78</time><pose>-6.25 -14.453125 2.616 0 -0.12226706817647846 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>25.29</time><pose>-6.25 -14.84375 2.664 0 0.023035924434521963 -1.5707963267948966</pose></waypoint>
-          <waypoint><time>25.80</time><pose>-6.25 -15.234375 2.655 0 0.023528171181801057 -2.356194490192345</pose></waypoint>
-          <waypoint><time>26.30</time><pose>-6.640625 -15.625 2.642 0 0.05425251028504437 -2.356194490192345</pose></waypoint>
-          <waypoint><time>26.81</time><pose>-7.03125 -16.015625 2.612 0 0.03838114231326515 3.141592653589793</pose></waypoint>
-          <waypoint><time>27.31</time><pose>-7.421875 -16.015625 2.597 0 -0.025337283652631975 -2.356194490192345</pose></waypoint>
-          <waypoint><time>27.82</time><pose>-7.8125 -16.40625 2.611 0 0.048836358899444605 -2.356194490192345</pose></waypoint>
-          <waypoint><time>28.33</time><pose>-8.203125 -16.796875 2.584 0 0.0054305266956830855 -2.356194490192345</pose></waypoint>
-          <waypoint><time>28.83</time><pose>-8.59375 -17.1875 2.581 0 0.056260565141440406 3.141592653589793</pose></waypoint>
-          <waypoint><time>29.34</time><pose>-8.984375 -17.1875 2.559 0 -0.015358792211414682 3.141592653589793</pose></waypoint>
-          <waypoint><time>29.84</time><pose>-9.375 -17.1875 2.565 0 0.020477137408829484 3.141592653589793</pose></waypoint>
-          <waypoint><time>30.35</time><pose>-9.765625 -17.1875 2.557 0 0.028152560048045824 3.141592653589793</pose></waypoint>
-          <waypoint><time>30.85</time><pose>-10.15625 -17.1875 2.546 0 0.07228158928706392 -2.356194490192345</pose></waypoint>
-          <waypoint><time>31.36</time><pose>-10.546875 -17.578125 2.506 0 0.039803220554527216 -2.356194490192345</pose></waypoint>
-          <waypoint><time>31.87</time><pose>-10.9375 -17.96875 2.484 0 0.032571956705669286 -2.356194490192345</pose></waypoint>
-          <waypoint><time>32.37</time><pose>-11.328125 -18.359375 2.466 0 0.1698670910138722 3.141592653589793</pose></waypoint>
-          <waypoint><time>32.88</time><pose>-11.71875 -18.359375 2.399 0 -0.007679849010399124 3.141592653589793</pose></waypoint>
-          <waypoint><time>33.38</time><pose>-12.109375 -18.359375 2.402 0 -0.007240646901643262 -2.356194490192345</pose></waypoint>
-          <waypoint><time>33.89</time><pose>-12.5 -18.75 2.4059999999999997 0 -0.0 3.141592653589793</pose></waypoint>
-          <waypoint><time>34.40</time><pose>-12.890625 -18.75 2.4059999999999997 0 0.06646196833413144 3.141592653589793</pose></waypoint>
-          <waypoint><time>34.90</time><pose>-13.28125 -18.75 2.38 0 -0.05115533099458317 3.141592653589793</pose></waypoint>
-          <waypoint><time>35.41</time><pose>-13.671875 -18.75 2.4 0 -0.04093711653858821 3.141592653589793</pose></waypoint>
-          <waypoint><time>35.91</time><pose>-14.0625 -18.75 2.416 0 -0.04093711653858821 3.141592653589793</pose></waypoint>
-          <waypoint><time>36.42</time><pose>-14.453125 -18.75 2.432 0 -0.007240646901643262 2.356194490192345</pose></waypoint>
-          <waypoint><time>36.92</time><pose>-14.84375 -18.359375 2.436 0 -0.005119955261461012 3.141592653589793</pose></waypoint>
-          <waypoint><time>37.43</time><pose>-15.234375 -18.359375 2.4379999999999997 0 -0.0036203709020885834 -2.356194490192345</pose></waypoint>
-          <waypoint><time>37.94</time><pose>-15.625 -18.75 2.44 0 -0.030710341791771775 3.141592653589793</pose></waypoint>
-          <waypoint><time>38.44</time><pose>-16.015625 -18.75 2.452 0 -0.12960336243374226 -2.356194490192345</pose></waypoint>
-          <waypoint><time>38.95</time><pose>-16.40625 -19.140625 2.524 0 -0.07048060417448267 -2.356194490192345</pose></waypoint>
-          <waypoint><time>39.45</time><pose>-16.796875 -19.53125 2.563 0 -0.11890913984978897 -2.356194490192345</pose></waypoint>
-          <waypoint><time>39.96</time><pose>-17.1875 -19.921875 2.629 0 -0.14238981987360225 3.141592653589793</pose></waypoint>
-          <waypoint><time>40.47</time><pose>-17.578125 -19.921875 2.685 0 -0.1723528650002448 3.141592653589793</pose></waypoint>
-          <waypoint><time>40.97</time><pose>-17.96875 -19.921875 2.753 0 -0.00905071965960151 -2.356194490192345</pose></waypoint>
-          <waypoint><time>41.48</time><pose>-18.359375 -20.3125 2.758 0 -0.24339686269862149 3.141592653589793</pose></waypoint>
-          <waypoint><time>41.98</time><pose>-18.75 -20.3125 2.855 0 -0.10963856965928807 3.141592653589793</pose></waypoint>
-          <waypoint><time>42.49</time><pose>-19.140625 -20.3125 2.898 0 -0.007679849010398556 3.141592653589793</pose></waypoint>
-          <waypoint><time>42.99</time><pose>-19.53125 -20.3125 2.901 0 -0.15443698668129488 2.356194490192345</pose></waypoint>
-          <waypoint><time>43.50</time><pose>-19.921875 -19.921875 2.987 0 0.0 0.0</pose></waypoint>
+          <waypoint>
+            <time>0.00</time>
+            <pose>-19.53125 3.125 4.215000000000001 0 0.019909495912442256 0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>0.50</time>
+            <pose>-19.140625 3.515625 4.204 0 -0.00905071965960151 0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>1.01</time>
+            <pose>-18.75 3.90625 4.2090000000000005 0 -0.16737919555388556 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>1.51</time>
+            <pose>-18.359375 3.90625 4.275 0 -0.043492555693404815 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>2.02</time>
+            <pose>-17.96875 3.90625 4.292000000000001 0 -0.15990306228996598 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>2.52</time>
+            <pose>-17.578125 3.90625 4.3549999999999995 0 -0.05626056514144154 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>3.03</time>
+            <pose>-17.1875 3.90625 4.377 0 -0.09951023414130583 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>3.53</time>
+            <pose>-16.796875 3.90625 4.416 0 -0.0758821392479278 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>4.04</time>
+            <pose>-16.40625 3.515625 4.458 0 0.0051199552614615805 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>4.54</time>
+            <pose>-16.015625 3.515625 4.456 0 -0.0025599944076175117 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>5.05</time>
+            <pose>-15.625 3.515625 4.457 0 0.012670675399834082 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>5.55</time>
+            <pose>-15.234375 3.125 4.45 0 0.019909495912442256 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>6.05</time>
+            <pose>-14.84375 2.734375 4.439 0 -0.027146230251172732 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>6.56</time>
+            <pose>-14.453125 2.34375 4.454 0 -0.08307723717183246 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>7.06</time>
+            <pose>-14.0625 1.953125 4.5 0 0.08682118986125743 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>7.57</time>
+            <pose>-13.671875 1.953125 4.466 0 -0.0018101913826273823 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>8.07</time>
+            <pose>-13.28125 1.5625 4.467 0 -0.030763578581274396 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>8.58</time>
+            <pose>-12.890625 1.171875 4.484 0 -0.06687727120419683 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>9.08</time>
+            <pose>-12.5 0.78125 4.521 0 0.08936137400761462 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>9.59</time>
+            <pose>-12.109375 0.78125 4.486 0 -0.012799301018044495 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>10.09</time>
+            <pose>-11.71875 0.78125 4.4910000000000005 0 0.02533728365263117 0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>10.60</time>
+            <pose>-11.328125 1.171875 4.477 0 -0.05881209839143956 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>11.10</time>
+            <pose>-10.9375 1.171875 4.5 0 0.012670675399833277 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>11.60</time>
+            <pose>-10.546875 0.78125 4.493 0 0.21425995290691618 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>12.11</time>
+            <pose>-10.546875 0.390625 4.408 0 0.05881209839144069 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>12.61</time>
+            <pose>-10.546875 0.0 4.385000000000001 0 0.020477137408829484 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>13.12</time>
+            <pose>-10.546875 -0.390625 4.377 0 0.10204432112926506 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>13.62</time>
+            <pose>-10.546875 -0.78125 4.337000000000001 0 0.2069753660223946 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>14.13</time>
+            <pose>-10.15625 -1.171875 4.221 0 0.023528171181801057 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>14.63</time>
+            <pose>-9.765625 -1.5625 4.208 0 0.10281717669615134 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>15.14</time>
+            <pose>-9.375 -1.953125 4.151 0 0.07155761259469054 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>15.64</time>
+            <pose>-8.984375 -1.953125 4.123 0 0.047030321959087726 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>16.15</time>
+            <pose>-8.59375 -2.34375 4.097 0 0.09205891508113268 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>16.65</time>
+            <pose>-8.203125 -2.734375 4.046 0 0.10963856965928807 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>17.15</time>
+            <pose>-7.8125 -2.734375 4.003 0 0.048601696049965615 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>17.66</time>
+            <pose>-7.421875 -2.734375 3.984 0 0.030710341791771775 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>18.16</time>
+            <pose>-7.03125 -2.734375 3.9720000000000004 0 0.053708298359551876 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>18.67</time>
+            <pose>-6.640625 -2.734375 3.951 0 0.03326772164384809 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>19.17</time>
+            <pose>-6.25 -2.734375 3.938 0 0.07768168114332888 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>19.68</time>
+            <pose>-5.859375 -3.125 3.8950000000000005 0 0.035824666255799824 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>20.18</time>
+            <pose>-5.46875 -3.125 3.8810000000000002 0 0.061362865217878766 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>20.69</time>
+            <pose>-5.078125 -3.125 3.857 0 0.04522397793632556 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>21.19</time>
+            <pose>-4.6875 -3.515625 3.832 0 0.050642077057023796 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>21.70</time>
+            <pose>-4.296875 -3.90625 3.8040000000000003 0 -0.04604742658121812 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>22.20</time>
+            <pose>-4.296875 -4.296875 3.822 0 -0.012799301018044495 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>22.70</time>
+            <pose>-4.296875 -4.6875 3.827 0 -0.07588213924792821 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>23.21</time>
+            <pose>-3.90625 -5.078125 3.869 0 -0.0036203709020885834 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>23.71</time>
+            <pose>-3.515625 -5.46875 3.8710000000000004 0 0.0018101913826277843 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>24.22</time>
+            <pose>-3.125 -5.859375 3.87 0 -0.1544369866812945 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>24.72</time>
+            <pose>-2.734375 -6.25 3.9560000000000004 0 -0.166784104894442 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>25.23</time>
+            <pose>-2.34375 -6.640625 4.049 0 0.023035924434520825 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>25.73</time>
+            <pose>-2.34375 -7.03125 4.04 0 0.037995765438969556 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>26.24</time>
+            <pose>-1.953125 -7.421875 4.019 0 0.01086073311105564 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>26.74</time>
+            <pose>-1.5625 -7.8125 4.013 0 0.023528171181801057 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>27.25</time>
+            <pose>-1.171875 -8.203125 4.0 0 -0.11355160775200596 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>27.75</time>
+            <pose>-0.78125 -8.59375 4.063 0 -0.23283457384929263 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>28.25</time>
+            <pose>-0.390625 -8.984375 4.194 0 0.021718904659462107 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>28.76</time>
+            <pose>0.0 -9.375 4.182 0 0.0488363588994442 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>29.26</time>
+            <pose>0.390625 -9.765625 4.155 0 0.03326772164384866 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>29.77</time>
+            <pose>0.78125 -9.765625 4.142 0 -0.005119955261461012 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>30.27</time>
+            <pose>1.171875 -9.765625 4.144 0 0.05425251028504476 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>30.78</time>
+            <pose>1.5625 -10.15625 4.114 0 -0.061469037968033026 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>31.28</time>
+            <pose>1.953125 -10.546875 4.148 0 -0.023035924434521394 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>31.79</time>
+            <pose>2.34375 -10.546875 4.157 0 0.025337283652631572 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>32.29</time>
+            <pose>2.734375 -10.9375 4.143 0 -0.05244746474390113 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>32.80</time>
+            <pose>3.125 -11.328125 4.172 0 -0.12247704066436221 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>33.30</time>
+            <pose>3.515625 -11.71875 4.24 0 -0.041610415504591124 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>33.80</time>
+            <pose>3.90625 -12.109375 4.263000000000001 0 0.0018101913826281864 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>34.31</time>
+            <pose>4.296875 -12.5 4.262 0 0.036188061913733534 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>34.81</time>
+            <pose>4.6875 -12.890625 4.242 0 -0.030763578581275198 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>35.32</time>
+            <pose>5.078125 -13.28125 4.259 0 -0.09205891508113227 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>35.82</time>
+            <pose>5.46875 -13.671875 4.31 0 -0.030763578581274396 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>36.33</time>
+            <pose>5.859375 -14.0625 4.327 0 0.01990949591244145 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>36.83</time>
+            <pose>6.25 -14.453125 4.316 0 -0.12226706817647846 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>37.34</time>
+            <pose>6.25 -14.84375 4.364 0 0.023035924434521963 -1.5707963267948966</pose>
+          </waypoint>
+          <waypoint>
+            <time>37.84</time>
+            <pose>6.25 -15.234375 4.3549999999999995 0 0.023528171181801057 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>38.35</time>
+            <pose>6.640625 -15.625 4.342 0 0.05425251028504437 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>38.85</time>
+            <pose>7.03125 -16.015625 4.312 0 0.03838114231326515 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>39.35</time>
+            <pose>7.421875 -16.015625 4.297 0 -0.025337283652631975 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>39.86</time>
+            <pose>7.8125 -16.40625 4.311000000000001 0 0.048836358899444605 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>40.36</time>
+            <pose>8.203125 -16.796875 4.284 0 0.0054305266956830855 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>40.87</time>
+            <pose>8.59375 -17.1875 4.281 0 0.056260565141440406 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>41.37</time>
+            <pose>8.984375 -17.1875 4.259 0 -0.015358792211414682 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>41.88</time>
+            <pose>9.375 -17.1875 4.265 0 0.020477137408829484 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>42.38</time>
+            <pose>9.765625 -17.1875 4.257000000000001 0 0.028152560048045824 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>42.89</time>
+            <pose>10.15625 -17.1875 4.2459999999999996 0 0.07228158928706392 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>43.39</time>
+            <pose>10.546875 -17.578125 4.206 0 0.039803220554527216 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>43.90</time>
+            <pose>10.9375 -17.96875 4.184 0 0.032571956705669286 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>44.40</time>
+            <pose>11.328125 -18.359375 4.166 0 0.1698670910138722 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>44.90</time>
+            <pose>11.71875 -18.359375 4.099 0 -0.007679849010399124 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>45.41</time>
+            <pose>12.109375 -18.359375 4.102 0 -0.007240646901643262 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>45.91</time>
+            <pose>12.5 -18.75 4.106 0 -0.0 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>46.42</time>
+            <pose>12.890625 -18.75 4.106 0 0.06646196833413144 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>46.92</time>
+            <pose>13.28125 -18.75 4.08 0 -0.05115533099458317 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>47.43</time>
+            <pose>13.671875 -18.75 4.1 0 -0.04093711653858821 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>47.93</time>
+            <pose>14.0625 -18.75 4.116 0 -0.04093711653858821 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>48.44</time>
+            <pose>14.453125 -18.75 4.132 0 -0.007240646901643262 0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>48.94</time>
+            <pose>14.84375 -18.359375 4.136 0 -0.005119955261461012 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>49.45</time>
+            <pose>15.234375 -18.359375 4.138 0 -0.0036203709020885834 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>49.95</time>
+            <pose>15.625 -18.75 4.14 0 -0.030710341791771775 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>50.45</time>
+            <pose>16.015625 -18.75 4.152 0 -0.12960336243374226 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>50.96</time>
+            <pose>16.40625 -19.140625 4.224 0 -0.07048060417448267 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>51.46</time>
+            <pose>16.796875 -19.53125 4.263000000000001 0 -0.11890913984978897 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>51.97</time>
+            <pose>17.1875 -19.921875 4.329 0 -0.14238981987360225 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>52.47</time>
+            <pose>17.578125 -19.921875 4.385000000000001 0 -0.1723528650002448 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>52.98</time>
+            <pose>17.96875 -19.921875 4.453 0 -0.00905071965960151 -0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>53.48</time>
+            <pose>18.359375 -20.3125 4.458 0 -0.24339686269862149 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>53.99</time>
+            <pose>18.75 -20.3125 4.555000000000001 0 -0.10963856965928807 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>54.49</time>
+            <pose>19.140625 -20.3125 4.598 0 -0.007679849010398556 0.0</pose>
+          </waypoint>
+          <waypoint>
+            <time>55.00</time>
+            <pose>19.53125 -20.3125 4.601 0 -0.15443698668129488 0.7853981633974483</pose>
+          </waypoint>
+          <waypoint>
+            <time>55.50</time>
+            <pose>19.921875 -19.921875 4.687 0 0.0 0.0</pose>
+          </waypoint>
         </trajectory>
       </script>
     </actor>
+
   </world>
 </sdf>

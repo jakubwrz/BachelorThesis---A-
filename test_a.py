@@ -4,12 +4,10 @@ import heapq
 import os
 import random
 
-# --- CONFIGURATION ---
 GRID_SIZE = 129
 REAL_SIZE = 50.0
 MAX_HEIGHT = 4.0
 
-# Start/Goal in Grid Coordinates
 START = (random.randrange(0, 90), random.randrange(0, 90))
 GOAL = (115, 115)
 print(f"Start: {START}, Goal: {GOAL}")
@@ -38,7 +36,6 @@ def get_3d_step_cost(curr, next_node, friction_map, height_map):
 
     base_energy = dist_2d * friction
     
-    # Add gravity penalty only if going uphill
     if delta_h > 0:
         return base_energy + (delta_h * GRAVITY_PENALTY)
     return base_energy
@@ -53,9 +50,11 @@ def heuristic(curr, goal, height_map):
 
 def run_astar(friction_map, height_map):
     print(f"Starting A* search from {START} to {GOAL}...")
+    
     open_list = []
     counter = 0 
     heapq.heappush(open_list, (0, counter, START))
+    
     came_from = {}
     g_score = {START: 0}
     f_score = {START: heuristic(START, GOAL, height_map)}
@@ -63,6 +62,7 @@ def run_astar(friction_map, height_map):
 
     while open_list:
         current = heapq.heappop(open_list)[2]
+        
         if current == GOAL:
             print("Path Found!")
             path = []
@@ -74,42 +74,53 @@ def run_astar(friction_map, height_map):
             return path
             
         closed_set.add(current)
+        
         cx, cy = current
         neighbors = [(cx, cy-1), (cx, cy+1), (cx-1, cy), (cx+1, cy),
                      (cx-1, cy-1), (cx+1, cy-1), (cx-1, cy+1), (cx+1, cy+1)]
                      
         for nx, ny in neighbors:
-            if not (0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE): continue
-            if (nx, ny) in closed_set: continue
+            if not (0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE):
+                continue
+            if (nx, ny) in closed_set:
+                continue
+                
             step_cost = get_3d_step_cost(current, (nx, ny), friction_map, height_map)
-            if step_cost == float('inf'): continue
+            if step_cost == float('inf'):
+                continue
+                
             tentative_g = g_score[current] + step_cost
+            
             if tentative_g < g_score.get((nx, ny), float('inf')):
                 came_from[(nx, ny)] = current
                 g_score[(nx, ny)] = tentative_g
                 f_score[(nx, ny)] = tentative_g + heuristic((nx, ny), GOAL, height_map)
+                
                 counter += 1
                 heapq.heappush(open_list, (f_score[(nx, ny)], counter, (nx, ny)))
                 
     print("NO PATH FOUND.")
     return []
 
+
 def grid_to_gazebo(grid_x, grid_y, grid_z):
-    # Perfect alignment for a CCW 90-degree rotated Gazebo Heightmap
-    gazebo_x = -(grid_y / (GRID_SIZE - 1)) * REAL_SIZE + (REAL_SIZE / 2.0)
+    gazebo_x = (grid_y / (GRID_SIZE - 1)) * REAL_SIZE - (REAL_SIZE / 2.0)
     gazebo_y = -(grid_x / (GRID_SIZE - 1)) * REAL_SIZE + (REAL_SIZE / 2.0)
-    return gazebo_x, gazebo_y, grid_z
+    # Gazebo heightmap is centered around the link frame in Z
+    z_offset = -MAX_HEIGHT / 2.0
+    return gazebo_x, gazebo_y, (grid_z + z_offset)
+
 
 def export_to_gazebo(path, height_map):
     print("Injecting route and robot into Gazebo world...")
-    HOVER_HEIGHT = 0.4  # Sufficient height to stay above terrain mesh curves
+    
+    HOVER_HEIGHT = 0.1  # Slight offset to keep the road visible
 
     with open(INPUT_WORLD, 'r') as file:
         world_data = file.read()
-
-    # Appending markers to the world file
-    world_data = world_data.replace("  </world>\n</sdf>", "")
-
+        
+    world_data = world_data.replace("</world>", "").replace("</sdf>", "").strip()
+    
     # 1. Start marker
     start_x, start_y, start_z = grid_to_gazebo(path[0][0], path[0][1], height_map[path[0][0]][path[0][1]])
     world_data += f"""
@@ -140,18 +151,30 @@ def export_to_gazebo(path, height_map):
     </model>
     """
 
-    # 3. Road segments
+    # 3. Road segments (RESTORED)
     for i in range(len(path) - 1):
         x1, y1 = path[i]
         x2, y2 = path[i + 1]
-        z1, z2 = height_map[x1][y1], height_map[x2][y2]
+        
+        z1 = height_map[x1][y1]
+        z2 = height_map[x2][y2]
+
         x1g, y1g, z1g = grid_to_gazebo(x1, y1, z1)
         x2g, y2g, z2g = grid_to_gazebo(x2, y2, z2)
-        mid_x, mid_y, mid_z = (x1g + x2g) / 2.0, (y1g + y2g) / 2.0, (z1g + z2g) / 2.0 + HOVER_HEIGHT
-        dx, dy, dz = x2g - x1g, y2g - y1g, z2g - z1g
+
+        mid_x = (x1g + x2g) / 2.0
+        mid_y = (y1g + y2g) / 2.0
+        mid_z = (z1g + z2g) / 2.0 + HOVER_HEIGHT
+
+        dx = x2g - x1g
+        dy = y2g - y1g
+        dz = z2g - z1g
+        
         dist_2d = math.hypot(dx, dy)
         length = math.hypot(dist_2d, dz) 
-        yaw, pitch = math.atan2(dy, dx), -math.atan2(dz, dist_2d) 
+        
+        yaw = math.atan2(dy, dx)
+        pitch = -math.atan2(dz, dist_2d) 
 
         world_data += f"""
     <model name="road_segment_{i}">
@@ -166,7 +189,7 @@ def export_to_gazebo(path, height_map):
     </model>
     """
 
-    # 4. Robot Trajectory
+    # 4. Robot Trajectory (RESTORED)
     world_data += f"""
     <actor name="my_robot">
       <pose>{start_x} {start_y} {start_z + HOVER_HEIGHT + 0.1} 0 0 0</pose>
@@ -177,33 +200,66 @@ def export_to_gazebo(path, height_map):
         </visual>
       </link>
       <script>
-        <loop>true</loop><delay_start>0.0</delay_start><auto_start>true</auto_start>
+        <loop>true</loop>
+        <delay_start>0.0</delay_start>
+        <auto_start>true</auto_start>
         <trajectory id="0" type="driving">
 """
+
     total_time = len(path) * 0.5
     time_step = total_time / (len(path) - 1) if len(path) > 1 else 0
-    curr_time = 0.0
+    current_time = 0.0
 
     for idx, (gx, gy) in enumerate(path):
         gz = height_map[gx][gy]
         wx, wy, wz = grid_to_gazebo(gx, gy, gz)
+        
         wz += HOVER_HEIGHT + 0.1  # Box height offset
+
         if idx < len(path) - 1:
             next_gx, next_gy = path[idx + 1]
             next_gz = height_map[next_gx][next_gy]
             next_wx, next_wy, _ = grid_to_gazebo(next_gx, next_gy, 0)
-            dx, dy, dz = next_wx - wx, next_wy - wy, next_gz - gz
-            yaw, pitch = math.atan2(dy, dx), -math.atan2(dz, math.hypot(dx, dy))
-        else: yaw, pitch = 0.0, 0.0
-        world_data += f"""          <waypoint><time>{curr_time:.2f}</time><pose>{wx} {wy} {wz} 0 {pitch} {yaw}</pose></waypoint>\n"""
-        curr_time += time_step
+            
+            dx = next_wx - wx
+            dy = next_wy - wy
+            dz = next_gz - gz
+            dist_2d = math.hypot(dx, dy)
+            
+            yaw = math.atan2(dy, dx)
+            pitch = -math.atan2(dz, dist_2d)
+        else:
+            yaw = 0.0
+            pitch = 0.0
 
-    world_data += """        </trajectory>\n      </script>\n    </actor>\n  </world>\n</sdf>"""
-    with open(OUTPUT_WORLD, 'w') as file: file.write(world_data)
+        world_data += f"""          <waypoint>
+            <time>{current_time:.2f}</time>
+            <pose>{wx} {wy} {wz} 0 {pitch} {yaw}</pose>
+          </waypoint>
+"""
+        current_time += time_step
+
+    world_data += """        </trajectory>
+      </script>
+    </actor>
+  </world>
+</sdf>"""
+
+    with open(OUTPUT_WORLD, 'w') as file:
+        file.write(world_data)
+        
     print(f"Route visualization saved to: {OUTPUT_WORLD}")
 
 if __name__ == "__main__":
-    with open(FRICTION_FILE, 'r') as f: friction_map = [[float(v) for v in r] for r in csv.reader(f)]
-    with open(HEIGHT_FILE, 'r') as f: height_map = [[float(v) for v in r] for r in csv.reader(f)]
+    print("Loading map data...")
+    with open(FRICTION_FILE, 'r') as f:
+        friction_map = [[float(val) for val in row] for row in csv.reader(f)]
+        
+    with open(HEIGHT_FILE, 'r') as f:
+        height_map = [[float(val) for val in row] for row in csv.reader(f)]
+        
     path = run_astar(friction_map, height_map)
-    if path: export_to_gazebo(path, height_map)
+    
+    if path:
+        print(f"Path length: {len(path)} steps.")
+        export_to_gazebo(path, height_map)
