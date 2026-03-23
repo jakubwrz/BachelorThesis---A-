@@ -1,18 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-One-pass terrain -> path planning -> world export (Gazebo).
+Terrain -> A* path -> Gazebo .world, with path Z sampled DIRECTLY from the
+same heightmap PNG the world uses (no CSV heights). This guarantees the path
+sits on the exact surface used to render the terrain.
 
-This merges your generate_terrain2.py and test_a.py:
-- Generates texture/heightmap images + CSVs (for inspection)
-- Plans A* path directly on in-memory arrays
-- Writes a single .world with road + actor aligned to the heightmap surface
+What this does
+--------------
+1) Generate a PERLIN terrain:
+   - heightmap.png  (linear 8-bit grayscale; Gazebo heightmap input)
+   - terrain_texture.png
+   - friction_map.csv (for A* cost)
+   - height_map.csv   (for inspection only; not used for Z)
 
-Key fix:
-- grid_to_gazebo() adds +MAX_HEIGHT/2 to Z so the path/robot sit on the surface.
+2) Plan an A* route on image-based heights (meters), consistent with what
+   Gazebo will render.
 
-Jakub’s original details preserved:
-- Perlin noise params, color/friction mapping, gamma for height *visual*
-- A* cost model (slope cap, gravity penalty), yaw/pitch along the path
+3) Build one .world where every road segment’s Z comes from the PNG using
+   the SAME formula SDF applies (<size>, <pos>), so road stays just above
+   the surface everywhere.
+
+Run
+---
+python3 terrain_plan_export.py
+# if you have a Gazebo instance already, kill or change port:
+killall -9 gzserver gzclient 2>/dev/null || true
+gazebo thesis_3d_path.world
 """
 
 import os
@@ -29,13 +41,36 @@ import noise
 IMG_SIZE = 129
 GRID_SIZE = IMG_SIZE
 
-REAL_SIZE = 50.0           # meters across X/Y (Gazebo size of the terrain)
-MAX_HEIGHT = 4.0           # meters peak-to-peak height of the terrain mesh
+REAL_SIZE  = 50.0           # meters across X/Y (Gazebo size of the terrain)
+MAX_HEIGHT = 4.0            # meters vertical span ("size.z" in SDF)
 
 NOISE_SCALE = 20.0
-SEED = 42
+SEED = 42                   # Perlin base seed
 
-# File outputs (also kept for debugging/inspection)
+# World building options
+HEIGHTMAP_BOTTOM_ALIGNED = False   # False: <pos>0 0 0</pos> (centered)
+                                   # True : <pos>0 0 MAX_HEIGHT/2</pos> (bottom aligned)
+REMOVE_GROUND_PLANE      = True
+
+# Visuals / road rendering
+HOVER_HEIGHT     = 0.05     # small gap above surface to prevent z-fighting
+ROAD_THICKNESS   = 0.12
+ROAD_WIDTH       = 0.30
+RESAMPLE_STEP_M  = 0.30     # road piece length (~0.2..0.5 looks good)
+ADD_DEBUG_PINS   = False
+PIN_EVERY_N      = 8
+
+# Route (start randomized but reproducible)
+random.seed(1234)
+START = (random.randrange(0, 90), random.randrange(0, 90))
+GOAL  = (115, 115)
+
+# A* cost parameters
+MIN_FRICTION    = 0.013
+GRAVITY_PENALTY = 10.0
+MAX_SLOPE       = 0.5
+
+# Files
 CURRENT_DIR = os.getcwd()
 OUTPUT_TEXTURE      = os.path.join(CURRENT_DIR, "terrain_texture.png")
 OUTPUT_HEIGHT_IMG   = os.path.join(CURRENT_DIR, "heightmap.png")
@@ -43,48 +78,26 @@ OUTPUT_WORLD        = os.path.join(CURRENT_DIR, "thesis_3d_path.world")
 OUTPUT_FRICTION_CSV = os.path.join(CURRENT_DIR, "friction_map.csv")
 OUTPUT_HEIGHT_CSV   = os.path.join(CURRENT_DIR, "height_map.csv")
 
-# Visual materials
-COLOR_ASPHALT = (50, 50, 50)
-COLOR_GRASS   = (34, 139, 34)
-COLOR_MUD     = (101, 67, 33)
-
-# Route & robot
-# (You can hard-code START if you want a stable start; here it's reproducible via SEED)
-random.seed(1234)
-START = (random.randrange(0, 90), random.randrange(0, 90))
-GOAL  = (115, 115)
-
-# A* cost parameters (from your test_a.py)
-MIN_FRICTION    = 0.013
-GRAVITY_PENALTY = 10.0
-MAX_SLOPE       = 0.5
-
-# Geometry placement
-HOVER_HEIGHT = 0.10        # small “lift” above surface for path and actor
-REMOVE_GROUND_PLANE = True # recommended with heightmap terrain
 
 # -----------------------------
 # 2) TERRAIN GENERATION
 # -----------------------------
 def get_terrain_data(val):
-    """
-    Return (color, friction) for a given Perlin value.
-    Matches your original thresholds.
-    """
+    """Return (color, friction) for a given Perlin value."""
     if val < -0.05:
-        return COLOR_ASPHALT, 0.013
+        return (50, 50, 50), 0.013      # asphalt
     elif val < 0.3:
-        return COLOR_GRASS, 0.05
+        return (34, 139, 34), 0.05      # grass
     else:
-        return COLOR_MUD, 0.35
+        return (101, 67, 33), 0.35      # mud
 
 def generate_terrain():
     """
     Produces:
-      - terrain_texture.png (for the visual)
-      - heightmap.png       (for the heightmap geometry)
-      - friction_map.csv, height_map.csv (for inspection/consistency)
-    Returns in-memory arrays: friction_map, height_map (meters in [0..MAX_HEIGHT]).
+      - terrain_texture.png (visual)
+      - heightmap.png       (heightmap geometry; LINEAR grayscale, strictly normalized)
+      - friction_map.csv, height_map.csv (for inspection)
+    Returns: friction_map (2D list), height_map (2D list), PIL height image
     """
     img_texture = Image.new('RGB', (IMG_SIZE, IMG_SIZE))
     img_height  = Image.new('L',   (IMG_SIZE, IMG_SIZE))
@@ -92,49 +105,125 @@ def generate_terrain():
     p_hgt = img_height.load()
 
     friction_map = []
-    height_map_m = []  # physical height in meters (0 .. MAX_HEIGHT)
+    height_map_m = [] 
 
+    # 1st Pass: Generate noise and find the absolute min and max
+    raw_noise = []
+    min_h = float('inf')
+    max_h = float('-inf')
+
+    for x in range(IMG_SIZE):
+        row_raw = []
+        for y in range(IMG_SIZE):
+            val_hgt = noise.pnoise2(x/NOISE_SCALE, y/NOISE_SCALE,
+                                    octaves=4, persistence=0.5, lacunarity=2.0, base=SEED+100)
+            row_raw.append(val_hgt)
+            if val_hgt < min_h: min_h = val_hgt
+            if val_hgt > max_h: max_h = val_hgt
+        raw_noise.append(row_raw)
+
+    # 2nd Pass: Normalize strictly to [0, 1] to prevent Gazebo from auto-stretching
     for x in range(IMG_SIZE):
         row_f = []
         row_h = []
         for y in range(IMG_SIZE):
-            # Texture & friction noise
+            # Texture & friction
             val_tex = noise.pnoise2(x/NOISE_SCALE, y/NOISE_SCALE,
                                     octaves=6, persistence=0.5, lacunarity=2.0, base=SEED)
             color, friction = get_terrain_data(val_tex)
             p_tex[x, y] = color
             row_f.append(friction)
 
-            # Height noise
-            val_hgt = noise.pnoise2(x/NOISE_SCALE, y/NOISE_SCALE,
-                                    octaves=4, persistence=0.5, lacunarity=2.0, base=SEED+100)
-            normalized_0_1 = (val_hgt + 1.0) / 2.0                # 0..1
-            physical_h_m   = normalized_0_1 * MAX_HEIGHT          # 0..MAX_HEIGHT
+            # Strict normalization maps the lowest point to 0 and highest to 1
+            if max_h > min_h:
+                normalized_0_1 = (raw_noise[x][y] - min_h) / (max_h - min_h)
+            else:
+                normalized_0_1 = 0.0
+                
+            physical_h_m = normalized_0_1 * MAX_HEIGHT 
 
-            # Gamma for *visual* height image only (geometry still comes from this image,
-            # but our path z-values are from 'physical_h_m', i.e., pre-gamma)
-            gamma_corrected = math.pow(normalized_0_1, 1.0/2.2)
-            px = int(max(0, min(255, gamma_corrected * 255)))
+            px = int(max(0, min(255, round(normalized_0_1 * 255))))
             p_hgt[x, y] = px
-
-            row_h.append(round(physical_h_m, 3))
+            row_h.append(physical_h_m)
+            
         friction_map.append(row_f)
         height_map_m.append(row_h)
 
-    # Save reference images & CSVs for inspection
     img_texture.save(OUTPUT_TEXTURE)
     img_height.save(OUTPUT_HEIGHT_IMG)
+
     with open(OUTPUT_FRICTION_CSV, "w", newline='') as f:
         csv.writer(f).writerows(friction_map)
     with open(OUTPUT_HEIGHT_CSV, "w", newline='') as f:
         csv.writer(f).writerows(height_map_m)
 
-    return friction_map, height_map_m
+    return friction_map, height_map_m, img_height
+
 
 # -----------------------------
-# 3) PATH PLANNING (A*)
+# 3) IMAGE-BASED HEIGHT SAMPLING
 # -----------------------------
-def get_3d_step_cost(curr, nxt, friction_map, height_map):
+def bilinear_sample_u8(img: Image.Image, u: float, v: float) -> float:
+    """Bilinear sample grayscale image at normalized coords u,v in [0,1]; returns p∈[0,1]."""
+    W, H = img.size
+    x = max(0.0, min(1.0, u)) * (W - 1)
+    y = max(0.0, min(1.0, v)) * (H - 1)
+
+    x0 = int(math.floor(x)); x1 = min(x0 + 1, W - 1)
+    y0 = int(math.floor(y)); y1 = min(y0 + 1, H - 1)
+    dx = x - x0; dy = y - y0
+
+    p00 = img.getpixel((x0, y0)) / 255.0
+    p10 = img.getpixel((x1, y0)) / 255.0
+    p01 = img.getpixel((x0, y1)) / 255.0
+    p11 = img.getpixel((x1, y1)) / 255.0
+
+    p0 = p00*(1-dx) + p10*dx
+    p1 = p01*(1-dx) + p11*dx
+    return p0*(1-dy) + p1*dy
+
+def csv_index_to_uv(grid_x: int, grid_y: int) -> tuple:
+    """Grid indices -> normalized image coords (u,v)."""
+    u = grid_x / (GRID_SIZE - 1)
+    v = grid_y / (GRID_SIZE - 1)
+    return u, v
+
+def world_xy_from_grid(grid_x: int, grid_y: int) -> tuple:
+    """Grid indices -> world (x,y), image centered over REAL_SIZE with Y flipped."""
+    u, v = csv_index_to_uv(grid_x, grid_y)
+    world_x = (u - 0.5) * REAL_SIZE
+    world_y = (0.5 - v) * REAL_SIZE
+    return world_x, world_y
+
+def world_to_uv(wx: float, wy: float, pos_x=0.0, pos_y=0.0) -> tuple:
+    """World (x,y) -> normalized (u,v) given <size>REAL_SIZE REAL_SIZE and <pos>.x/y (here zero)."""
+    u = (wx - pos_x) / REAL_SIZE + 0.5
+    v = 0.5 - (wy - pos_y) / REAL_SIZE
+    return u, v
+
+def terrain_z_from_world_xy(wx: float, wy: float, height_img: Image.Image,
+                            size_z: float, pos_z: float, bottom_aligned: bool) -> float:
+    """
+    Sample the PNG at (wx,wy) and map to world Z using the exact SDF formula.
+    Gazebo heightmaps extrude UPWARDS from their local Z origin, they do not center.
+    """
+    u, v = world_to_uv(wx, wy, pos_x=0.0, pos_y=0.0)
+    p = bilinear_sample_u8(height_img, u, v)  # [0..1]
+    
+    # Regardless of orientation flags, Z is simply the base Z + (pixel * total_height)
+    return pos_z + (p * size_z)
+
+
+# -----------------------------
+# 4) PATH PLANNING (A*) on image heights
+# -----------------------------
+def get_height_m_from_img(grid_x: int, grid_y: int, height_img: Image.Image) -> float:
+    """Return physical height in meters (0..MAX_HEIGHT) from image."""
+    u, v = csv_index_to_uv(grid_x, grid_y)
+    p = bilinear_sample_u8(height_img, u, v)
+    return p * MAX_HEIGHT
+
+def get_3d_step_cost(curr, nxt, friction_map, height_img: Image.Image):
     cx, cy = curr
     nx, ny = nxt
     dist_2d = math.hypot(nx - cx, ny - cy)
@@ -142,8 +231,8 @@ def get_3d_step_cost(curr, nxt, friction_map, height_map):
         return float('inf')
 
     friction = friction_map[nx][ny]
-    h_curr = height_map[cx][cy]
-    h_next = height_map[nx][ny]
+    h_curr = get_height_m_from_img(cx, cy, height_img)  # meters [0..MAX_HEIGHT]
+    h_next = get_height_m_from_img(nx, ny, height_img)
     dh = h_next - h_curr
     slope = abs(dh) / dist_2d
     if slope > MAX_SLOPE:
@@ -154,15 +243,15 @@ def get_3d_step_cost(curr, nxt, friction_map, height_map):
         return base_energy + (dh * GRAVITY_PENALTY)
     return base_energy
 
-def heuristic(curr, goal, height_map):
+def heuristic(curr, goal, height_img: Image.Image):
     cx, cy = curr
     gx, gy = goal
-    cz = height_map[cx][cy]
-    gz = height_map[gx][gy]
+    cz = get_height_m_from_img(cx, cy, height_img)
+    gz = get_height_m_from_img(gx, gy, height_img)
     dist_3d = math.sqrt((gx - cx)**2 + (gy - cy)**2 + (gz - cz)**2)
     return dist_3d * MIN_FRICTION
 
-def run_astar(friction_map, height_map):
+def run_astar(friction_map, height_img: Image.Image):
     import heapq
     open_list = []
     counter = 0
@@ -170,7 +259,7 @@ def run_astar(friction_map, height_map):
 
     came_from = {}
     g_score = {START: 0.0}
-    f_score = {START: heuristic(START, GOAL, height_map)}
+    f_score = {START: heuristic(START, GOAL, height_img)}
     closed = set()
 
     while open_list:
@@ -196,48 +285,69 @@ def run_astar(friction_map, height_map):
                 continue
             if (nx, ny) in closed:
                 continue
-            step = get_3d_step_cost(current, (nx, ny), friction_map, height_map)
+            step = get_3d_step_cost(current, (nx, ny), friction_map, height_img)
             if step == float('inf'):
                 continue
             tentative_g = g_score[current] + step
             if tentative_g < g_score.get((nx, ny), float('inf')):
                 came_from[(nx, ny)] = current
                 g_score[(nx, ny)] = tentative_g
-                f_score[(nx, ny)] = tentative_g + heuristic((nx, ny), GOAL, height_map)
+                f_score[(nx, ny)] = tentative_g + heuristic((nx, ny), GOAL, height_img)
                 counter += 1
                 heapq.heappush(open_list, (f_score[(nx, ny)], counter, (nx, ny)))
 
     return []  # no path
 
+
 # -----------------------------
-# 4) WORLD EXPORT
+# 5) PATH RESAMPLING -> DENSE WORLD POLYLINE
 # -----------------------------
-def grid_to_gazebo(grid_x, grid_y, grid_z):
+def resample_polyline_world(path_grid, height_img: Image.Image,
+                            step_m: float, size_z: float, pos_z: float, bottom_aligned: bool):
     """
-    Map grid indices -> Gazebo world (meters).
-    X/Y mapping matches your existing orientation.
-
-    **Critical Z fix (Option A):**
-    The heightmap mesh in Gazebo is centered around the link's origin,
-    so we add +MAX_HEIGHT/2 to pose Z so objects sit on the visible surface.
+    Convert grid path [(gx,gy), ...] to dense world polyline [(wx,wy,wz), ...],
+    sampling Z from the height image every ~step_m meters with the SAME formula SDF uses.
     """
-    gazebo_x = (grid_y / (GRID_SIZE - 1)) * REAL_SIZE - (REAL_SIZE / 2.0)
-    gazebo_y = -(grid_x / (GRID_SIZE - 1)) * REAL_SIZE + (REAL_SIZE / 2.0)
+    dense = []
+    for i in range(len(path_grid) - 1):
+        x1, y1 = path_grid[i]
+        x2, y2 = path_grid[i + 1]
+        w1x, w1y = world_xy_from_grid(x1, y1)
+        w2x, w2y = world_xy_from_grid(x2, y2)
+        dx = w2x - w1x
+        dy = w2y - w1y
+        seg_len = math.hypot(dx, dy)
+        if seg_len < 1e-9:
+            continue
+        n_steps = max(1, int(math.ceil(seg_len / step_m)))
+        for k in range(n_steps):
+            t = k / n_steps
+            wx = w1x + t * dx
+            wy = w1y + t * dy
+            wz = terrain_z_from_world_xy(wx, wy, height_img, size_z, pos_z, bottom_aligned)
+            dense.append((wx, wy, wz))
+    # include the final endpoint
+    w2x, w2y = world_xy_from_grid(path_grid[-1][0], path_grid[-1][1])
+    wz_end   = terrain_z_from_world_xy(w2x, w2y, height_img, size_z, pos_z, bottom_aligned)
+    dense.append((w2x, w2y, wz_end))
+    return dense
 
-    z_offset = +MAX_HEIGHT / 2.0     # <<< IMPORTANT: positive offset
-    gazebo_z = grid_z + z_offset
 
-    return gazebo_x, gazebo_y, gazebo_z
-
-def build_world_sdf(path, height_map):
+# -----------------------------
+# 6) WORLD EXPORT (SDF)
+# -----------------------------
+def build_world_sdf(path, height_img: Image.Image):
     """
-    Compose a full world SDF string with:
-    - Heightmap (visual + collision) at <pos> 0 0 0
-    - No ground_plane
+    Compose a .world SDF with:
+    - Heightmap placed either centered or bottom-aligned (toggle)
     - Start/goal markers
-    - Road segments following the surface
-    - Actor following the same waypoints
+    - Road as many short segments following the surface closely
     """
+    HEIGHT_URI = "file://" + os.path.abspath(OUTPUT_HEIGHT_IMG)
+    TEX_URI    = "file://" + os.path.abspath(OUTPUT_TEXTURE)
+
+    pos_z_for_sdf = (MAX_HEIGHT / 2.0) if HEIGHTMAP_BOTTOM_ALIGNED else 0.0
+
     world_header = """<?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
@@ -247,7 +357,6 @@ def build_world_sdf(path, height_map):
     if not REMOVE_GROUND_PLANE:
         world_header += '    <include><uri>model://ground_plane</uri></include>\n'
 
-    # Heightmap SDF at z=0 (we do all Z offsetting in poses)
     terrain_model = f"""
     <model name="thesis_terrain">
       <static>true</static>
@@ -255,9 +364,9 @@ def build_world_sdf(path, height_map):
         <collision name="collision">
           <geometry>
             <heightmap>
-              <uri>file://{OUTPUT_HEIGHT_IMG}</uri>
+              <uri>{HEIGHT_URI}</uri>
               <size>{REAL_SIZE} {REAL_SIZE} {MAX_HEIGHT}</size>
-              <pos>0 0 0</pos>
+              <pos>0 0 {pos_z_for_sdf}</pos>
             </heightmap>
           </geometry>
           <surface>
@@ -273,13 +382,13 @@ def build_world_sdf(path, height_map):
             <heightmap>
               <use_terrain_paging>false</use_terrain_paging>
               <texture>
-                <diffuse>file://{OUTPUT_TEXTURE}</diffuse>
+                <diffuse>{TEX_URI}</diffuse>
                 <normal>file://media/materials/textures/flat_normal.png</normal>
                 <size>{REAL_SIZE}</size>
               </texture>
-              <uri>file://{OUTPUT_HEIGHT_IMG}</uri>
+              <uri>{HEIGHT_URI}</uri>
               <size>{REAL_SIZE} {REAL_SIZE} {MAX_HEIGHT}</size>
-              <pos>0 0 0</pos>
+              <pos>0 0 {pos_z_for_sdf}</pos>
             </heightmap>
           </geometry>
         </visual>
@@ -287,19 +396,19 @@ def build_world_sdf(path, height_map):
     </model>
 """
 
-    # Markers
+    # Start / Goal markers (sample Z from image using the SAME formula)
     sx, sy = path[0]
     gx, gy = path[-1]
-    sz = height_map[sx][sy]
-    gz = height_map[gx][gy]
+    sxw, syw = world_xy_from_grid(sx, sy)
+    gxw, gyw = world_xy_from_grid(gx, gy)
 
-    start_x, start_y, start_z = grid_to_gazebo(sx, sy, sz)
-    goal_x,  goal_y,  goal_z  = grid_to_gazebo(gx, gy, gz)
+    sz = terrain_z_from_world_xy(sxw, syw, height_img, MAX_HEIGHT, pos_z_for_sdf, HEIGHTMAP_BOTTOM_ALIGNED)
+    gz = terrain_z_from_world_xy(gxw, gyw, height_img, MAX_HEIGHT, pos_z_for_sdf, HEIGHTMAP_BOTTOM_ALIGNED)
 
     start_model = f"""
     <model name="start_marker">
       <static>true</static>
-      <pose>{start_x} {start_y} {start_z + HOVER_HEIGHT + 0.25} 0 0 0</pose>
+      <pose>{sxw} {syw} {sz + HOVER_HEIGHT + 0.25} 0 0 0</pose>
       <link name="link">
         <visual name="visual">
           <geometry><cylinder><radius>0.4</radius><length>0.5</length></cylinder></geometry>
@@ -311,7 +420,7 @@ def build_world_sdf(path, height_map):
     goal_model = f"""
     <model name="goal_marker">
       <static>true</static>
-      <pose>{goal_x} {goal_y} {goal_z + HOVER_HEIGHT + 0.25} 0 0 0</pose>
+      <pose>{gxw} {gyw} {gz + HOVER_HEIGHT + 0.25} 0 0 0</pose>
       <link name="link">
         <visual name="visual">
           <geometry><cylinder><radius>0.4</radius><length>0.5</length></cylinder></geometry>
@@ -321,27 +430,41 @@ def build_world_sdf(path, height_map):
     </model>
 """
 
-    # Road segments following the surface
+    # Road: dense segments closely following the surface
+    dense_pts = resample_polyline_world(path, height_img, RESAMPLE_STEP_M,
+                                        MAX_HEIGHT, pos_z_for_sdf, HEIGHTMAP_BOTTOM_ALIGNED)
     road_models = []
-    for i in range(len(path) - 1):
-        x1, y1 = path[i]
-        x2, y2 = path[i + 1]
-        z1 = height_map[x1][y1]
-        z2 = height_map[x2][y2]
+    if ADD_DEBUG_PINS:
+        for k, (wx, wy, wz) in enumerate(dense_pts[::max(1, PIN_EVERY_N)]):
+            road_models.append(f"""
+    <model name="pin_{k}">
+      <static>true</static>
+      <pose>{wx} {wy} {wz + 1.0} 0 0 0</pose>
+      <link name="link">
+        <visual name="v">
+          <geometry><cylinder><radius>0.03</radius><length>2.0</length></cylinder></geometry>
+          <material><ambient>1 0 1 1</ambient><diffuse>1 0 1 1</diffuse><emissive>1 0 1 1</emissive></material>
+        </visual>
+      </link>
+    </model>
+""")
 
-        x1g, y1g, z1g = grid_to_gazebo(x1, y1, z1)
-        x2g, y2g, z2g = grid_to_gazebo(x2, y2, z2)
+    for i in range(len(dense_pts) - 1):
+        x1g, y1g, z1g = dense_pts[i]
+        x2g, y2g, z2g = dense_pts[i + 1]
 
         mid_x = (x1g + x2g) / 2.0
         mid_y = (y1g + y2g) / 2.0
-        mid_z = (z1g + z2g) / 2.0 + HOVER_HEIGHT
+        # hover + half thickness -> clearly above the surface everywhere
+        mid_z = (z1g + z2g) / 2.0 + HOVER_HEIGHT + (ROAD_THICKNESS / 2.0)
 
         dx = x2g - x1g
         dy = y2g - y1g
         dz = z2g - z1g
+
         dist_2d = math.hypot(dx, dy)
         length = math.hypot(dist_2d, dz)
-        yaw = math.atan2(dy, dx)
+        yaw   = math.atan2(dy, dx)
         pitch = -math.atan2(dz, dist_2d) if dist_2d > 1e-6 else 0.0
 
         road_models.append(f"""
@@ -350,93 +473,49 @@ def build_world_sdf(path, height_map):
       <pose>{mid_x} {mid_y} {mid_z} 0 {pitch} {yaw}</pose>
       <link name="link">
         <visual name="visual">
-          <geometry><box><size>{length} 0.25 0.05</size></box></geometry>
-          <material><ambient>0.8 0.8 0 1</ambient><diffuse>0.9 0.9 0 1</diffuse><emissive>0.9 0.9 0 1</emissive></material>
+          <geometry><box><size>{length} {ROAD_WIDTH} {ROAD_THICKNESS}</size></box></geometry>
+          <material>
+            <ambient>0.9 0.9 0 1</ambient>
+            <diffuse>1 1 0 1</diffuse>
+            <emissive>1 1 0 1</emissive>
+          </material>
         </visual>
       </link>
     </model>
 """)
-
-    # Actor trajectory (waypoints along the path)
-    total_time = len(path) * 0.5
-    time_step = total_time / (len(path) - 1) if len(path) > 1 else 0.0
-
-    actor_block = f"""
-    <actor name="my_robot">
-      <pose>{start_x} {start_y} {start_z + HOVER_HEIGHT + 0.1} 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><box><size>0.6 0.4 0.2</size></box></geometry>
-          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
-        </visual>
-      </link>
-      <script>
-        <loop>true</loop>
-        <delay_start>0.0</delay_start>
-        <auto_start>true</auto_start>
-        <trajectory id="0" type="driving">
-"""
-
-    current_time = 0.0
-    for idx, (gx, gy) in enumerate(path):
-        gz = height_map[gx][gy]
-        wx, wy, wz = grid_to_gazebo(gx, gy, gz)
-        wz += HOVER_HEIGHT + 0.1
-
-        # Orientation towards next point
-        if idx < len(path) - 1:
-            ngx, ngy = path[idx + 1]
-            ngz = height_map[ngx][ngy]
-            nwx, nwy, _ = grid_to_gazebo(ngx, ngy, 0.0)
-            dx = nwx - wx
-            dy = nwy - wy
-            dz = (ngz - gz)  # world z difference uses same +offset -> cancels
-            dist_2d = math.hypot(dx, dy)
-            yaw = math.atan2(dy, dx)
-            pitch = -math.atan2(dz, dist_2d) if dist_2d > 1e-6 else 0.0
-        else:
-            yaw = 0.0
-            pitch = 0.0
-
-        actor_block += f"""          <waypoint>
-            <time>{current_time:.2f}</time>
-            <pose>{wx} {wy} {wz} 0 {pitch} {yaw}</pose>
-          </waypoint>
-"""
-        current_time += time_step
-
-    actor_block += """        </trajectory>
-      </script>
-    </actor>
-"""
 
     world_footer = """
   </world>
 </sdf>
 """
 
-    world = world_header + terrain_model + start_model + goal_model + "".join(road_models) + actor_block + world_footer
-    return world
+    return world_header + terrain_model + start_model + goal_model + "".join(road_models) + world_footer
 
+
+# -----------------------------
+# 7) MAIN
+# -----------------------------
 def main():
     print(f"Start: {START}, Goal: {GOAL}")
 
     # 1) Generate terrain
-    friction_map, height_map = generate_terrain()
+    friction_map, height_map, height_img = generate_terrain()
 
-    # 2) Plan path
-    path = run_astar(friction_map, height_map)
+    # 2) Plan path on image heights (meters)
+    path = run_astar(friction_map, height_img)
     if not path:
         print("NO PATH FOUND.")
         return
-    print(f"Path length: {len(path)}")
+    print(f"Path length (grid nodes): {len(path)}")
 
-    # 3) Build SDF & write world
-    sdf = build_world_sdf(path, height_map)
+    # 3) Build SDF and write world
+    sdf = build_world_sdf(path, height_img)
     with open(OUTPUT_WORLD, "w") as f:
         f.write(sdf)
 
     print(f"World saved to: {OUTPUT_WORLD}")
+    print(f"Open with: gazebo {OUTPUT_WORLD}")
+
 
 if __name__ == "__main__":
     main()
