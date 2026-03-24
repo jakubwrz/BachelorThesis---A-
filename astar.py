@@ -1,32 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Terrain -> A* path -> Gazebo .world, with path Z sampled DIRECTLY from the
-same heightmap PNG the world uses (no CSV heights). This guarantees the path
-sits on the exact surface used to render the terrain.
-
-What this does
---------------
-1) Generate a PERLIN terrain:
-   - heightmap.png  (linear 8-bit grayscale; Gazebo heightmap input)
-   - terrain_texture.png
-   - friction_map.csv (for A* cost)
-   - height_map.csv   (for inspection only; not used for Z)
-
-2) Plan an A* route on image-based heights (meters), consistent with what
-   Gazebo will render.
-
-3) Build one .world where every road segment’s Z comes from the PNG using
-   the SAME formula SDF applies (<size>, <pos>), so road stays just above
-   the surface everywhere.
-
-Run
----
-python3 terrain_plan_export.py
-# if you have a Gazebo instance already, kill or change port:
-killall -9 gzserver gzclient 2>/dev/null || true
-gazebo thesis_3d_path.world
-"""
-
 import os
 import csv
 import math
@@ -35,9 +6,8 @@ import random
 from PIL import Image
 import noise
 
-# -----------------------------
-# 1) CONFIGURATION
-# -----------------------------
+from generate_terrain import generate_terrain  
+
 IMG_SIZE = 129
 GRID_SIZE = IMG_SIZE
 
@@ -61,7 +31,7 @@ ADD_DEBUG_PINS   = False
 PIN_EVERY_N      = 8
 
 # Route (start randomized but reproducible)
-random.seed(1234)
+random.seed(12)
 START = (random.randrange(0, 90), random.randrange(0, 90))
 GOAL  = (115, 115)
 
@@ -91,73 +61,6 @@ def get_terrain_data(val):
     else:
         return (101, 67, 33), 0.35      # mud
 
-def generate_terrain():
-    """
-    Produces:
-      - terrain_texture.png (visual)
-      - heightmap.png       (heightmap geometry; LINEAR grayscale, strictly normalized)
-      - friction_map.csv, height_map.csv (for inspection)
-    Returns: friction_map (2D list), height_map (2D list), PIL height image
-    """
-    img_texture = Image.new('RGB', (IMG_SIZE, IMG_SIZE))
-    img_height  = Image.new('L',   (IMG_SIZE, IMG_SIZE))
-    p_tex = img_texture.load()
-    p_hgt = img_height.load()
-
-    friction_map = []
-    height_map_m = [] 
-
-    # 1st Pass: Generate noise and find the absolute min and max
-    raw_noise = []
-    min_h = float('inf')
-    max_h = float('-inf')
-
-    for x in range(IMG_SIZE):
-        row_raw = []
-        for y in range(IMG_SIZE):
-            val_hgt = noise.pnoise2(x/NOISE_SCALE, y/NOISE_SCALE,
-                                    octaves=4, persistence=0.5, lacunarity=2.0, base=SEED+100)
-            row_raw.append(val_hgt)
-            if val_hgt < min_h: min_h = val_hgt
-            if val_hgt > max_h: max_h = val_hgt
-        raw_noise.append(row_raw)
-
-    # 2nd Pass: Normalize strictly to [0, 1] to prevent Gazebo from auto-stretching
-    for x in range(IMG_SIZE):
-        row_f = []
-        row_h = []
-        for y in range(IMG_SIZE):
-            # Texture & friction
-            val_tex = noise.pnoise2(x/NOISE_SCALE, y/NOISE_SCALE,
-                                    octaves=6, persistence=0.5, lacunarity=2.0, base=SEED)
-            color, friction = get_terrain_data(val_tex)
-            p_tex[x, y] = color
-            row_f.append(friction)
-
-            # Strict normalization maps the lowest point to 0 and highest to 1
-            if max_h > min_h:
-                normalized_0_1 = (raw_noise[x][y] - min_h) / (max_h - min_h)
-            else:
-                normalized_0_1 = 0.0
-                
-            physical_h_m = normalized_0_1 * MAX_HEIGHT 
-
-            px = int(max(0, min(255, round(normalized_0_1 * 255))))
-            p_hgt[x, y] = px
-            row_h.append(physical_h_m)
-            
-        friction_map.append(row_f)
-        height_map_m.append(row_h)
-
-    img_texture.save(OUTPUT_TEXTURE)
-    img_height.save(OUTPUT_HEIGHT_IMG)
-
-    with open(OUTPUT_FRICTION_CSV, "w", newline='') as f:
-        csv.writer(f).writerows(friction_map)
-    with open(OUTPUT_HEIGHT_CSV, "w", newline='') as f:
-        csv.writer(f).writerows(height_map_m)
-
-    return friction_map, height_map_m, img_height
 
 
 # -----------------------------
@@ -498,8 +401,9 @@ def build_world_sdf(path, height_img: Image.Image):
 def main():
     print(f"Start: {START}, Goal: {GOAL}")
 
-    # 1) Generate terrain
-    friction_map, height_map, height_img = generate_terrain()
+    map_type = input("Enter scenario type (mix/friction/hill): ").strip().lower()
+
+    friction_map, height_map, height_img = generate_terrain(map_type)
 
     # 2) Plan path on image heights (meters)
     path = run_astar(friction_map, height_img)
