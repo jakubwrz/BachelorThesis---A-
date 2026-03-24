@@ -5,7 +5,7 @@ import noise
 # Configuration constants
 IMG_SIZE = 129  # Adjust as needed
 NOISE_SCALE = 100  # Adjust as needed
-SEED = 42  # Adjust as needed
+SEED = 12  # Adjust as needed
 MAX_HEIGHT = 1.0  # Adjust as needed
 OUTPUT_TEXTURE = "terrain_texture.png"
 OUTPUT_HEIGHT_IMG = "heightmap.png"
