@@ -6,7 +6,7 @@ import random
 
 from PIL import Image
 
-# Import your custom terrain generator (Ensure separate file exists with color fixes)
+# Import your custom terrain generator
 try:
     from generate_terrain import generate_terrain  
 except ImportError:
@@ -123,8 +123,6 @@ def smooth_path_los(path, friction_map, height_img):
             astar_cost, _ = get_dense_grid_cost(astar_segment, friction_map, height_img)
             
             # 3. Only pull the string if the shortcut avoids hills/mud!
-            # We allow a tiny 2% margin because straight diagonal lines on a grid 
-            # naturally measure slightly longer mathematically than human lines.
             if valid and straight_cost <= (astar_cost * 1.02):
                 furthest_visible = j
             else:
@@ -137,13 +135,70 @@ def smooth_path_los(path, friction_map, height_img):
     print(f"Original nodes: {len(path)} -> Smoothed nodes: {len(smoothed_path)}")
     return smoothed_path
 
-def verify_path_costs(astar_path, straight_path_grid, friction_map, height_img):
-    """Compares the smoothed A* path against a mathematical straight line."""
+def optimize_path_rubberband(path, friction_map, height_img, max_iters=30):
+    """
+    Actively pulls waypoints tighter against obstacles to find the true shortest 
+    physical route without relying on the original A* grid limitations.
+    """
+    if len(path) <= 2:
+        return path
+        
+    print("Optimizing path (Rubberband Gradient Descent)...")
+    current_path = path.copy()
+    optimized = True
+    iterations = 0
+    
+    while optimized and iterations < max_iters:
+        optimized = False
+        iterations += 1
+        
+        # Go through every "corner" in the smoothed path
+        for i in range(1, len(current_path) - 1):
+            prev_node = current_path[i-1]
+            curr_node = current_path[i]
+            next_node = current_path[i+1]
+            
+            # Calculate the current cost of the two segments connecting this corner
+            cost_curr1, v1 = get_dense_grid_cost([prev_node, curr_node], friction_map, height_img)
+            cost_curr2, v2 = get_dense_grid_cost([curr_node, next_node], friction_map, height_img)
+            best_cost = cost_curr1 + cost_curr2
+            best_node = curr_node
+            
+            # Check the 8 surrounding grid spaces to see if moving the corner saves energy
+            cx, cy = curr_node
+            neighbors = [
+                (cx, cy-1), (cx, cy+1), (cx-1, cy), (cx+1, cy),
+                (cx-1, cy-1), (cx+1, cy-1), (cx-1, cy+1), (cx+1, cy+1)
+            ]
+            
+            for nx, ny in neighbors:
+                if not (0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE): 
+                    continue
+                    
+                # Calculate cost if we pulled the string to this new neighbor
+                c1, val1 = get_dense_grid_cost([prev_node, (nx, ny)], friction_map, height_img)
+                c2, val2 = get_dense_grid_cost([(nx, ny), next_node], friction_map, height_img)
+                
+                # If it's a valid terrain and strictly cheaper, update our best choice
+                if val1 and val2 and (c1 + c2) < best_cost - 0.0001:
+                    best_cost = c1 + c2
+                    best_node = (nx, ny)
+                    
+            # If we found a tighter corner, update the path and trigger another loop
+            if best_node != curr_node:
+                current_path[i] = best_node
+                optimized = True
+                
+    print(f"Rubberband Optimization finished in {iterations} iterations.")
+    return current_path
+
+def verify_path_costs(final_path, straight_path_grid, friction_map, height_img):
+    """Compares the fully optimized path against a mathematical straight line."""
     print("\n--- PATH VERIFICATION ---")
     
-    # Use our new helper to accurately step through every cell of the smoothed path
-    astar_cost, _ = get_dense_grid_cost(astar_path, friction_map, height_img)
-    print(f"Smoothed A* Path Cost:  {astar_cost:.4f}")
+    # Use our dense checker to accurately step through every cell of the optimized path
+    astar_cost, _ = get_dense_grid_cost(final_path, friction_map, height_img)
+    print(f"Optimized Path Cost:    {astar_cost:.4f}")
 
     # The straight path is already dense, but we can use the same helper
     straight_cost, is_valid = get_dense_grid_cost([straight_path_grid[0], straight_path_grid[-1]], friction_map, height_img)
@@ -156,7 +211,7 @@ def verify_path_costs(astar_path, straight_path_grid, friction_map, height_img):
         diff = straight_cost - astar_cost
         print(f"Difference:             {diff:.4f}")
         if diff > 0:
-            print("Conclusion: A* successfully routed around a hill or high-friction area!")
+            print("Conclusion: Algorithm successfully routed around a hill or high-friction area!")
     print("-------------------------\n")
 
 
@@ -339,7 +394,7 @@ def resample_polyline_world(path_grid, height_img: Image.Image,
 # -----------------------------
 # 6) WORLD EXPORT (SDF)
 # -----------------------------
-def build_world_sdf(astar_path, straight_path_grid, height_img: Image.Image, friction_map):
+def build_world_sdf(final_path, straight_path_grid, height_img: Image.Image, friction_map):
     HEIGHT_URI = "file://" + os.path.abspath(OUTPUT_HEIGHT_IMG)
     TEX_URI    = "file://" + os.path.abspath(OUTPUT_TEXTURE)
 
@@ -392,8 +447,8 @@ def build_world_sdf(astar_path, straight_path_grid, height_img: Image.Image, fri
 """
 
     # Start / Goal markers
-    sx, sy = astar_path[0]
-    gx, gy = astar_path[-1]
+    sx, sy = final_path[0]
+    gx, gy = final_path[-1]
     sxw, syw = world_xy_from_grid(sx, sy)
     gxw, gyw = world_xy_from_grid(gx, gy)
 
@@ -426,7 +481,7 @@ def build_world_sdf(astar_path, straight_path_grid, height_img: Image.Image, fri
 """
 
     # --- PART 1: A* Road (Hardcoded Yellow) ---
-    dense_pts = resample_polyline_world(astar_path, height_img, RESAMPLE_STEP_M,
+    dense_pts = resample_polyline_world(final_path, height_img, RESAMPLE_STEP_M,
                                         MAX_HEIGHT, pos_z_for_sdf, HEIGHTMAP_BOTTOM_ALIGNED)
     road_models = []
 
@@ -525,15 +580,18 @@ def main():
 
     # 3) SMOOTH THE PATH (Cost-Aware String-Pulling)
     smoothed_path = smooth_path_los(raw_path, friction_map, height_img)
+    
+    # NEW: Pull the string tight against the obstacles!
+    final_path = optimize_path_rubberband(smoothed_path, friction_map, height_img)
 
     # 4) Generate mathematically direct line grid coordinates early for use in Verify and Build
-    straight_line_grid = get_bresenham_line(smoothed_path[0][0], smoothed_path[0][1], smoothed_path[-1][0], smoothed_path[-1][1])
+    straight_line_grid = get_bresenham_line(final_path[0][0], final_path[0][1], final_path[-1][0], final_path[-1][1])
 
-    # 5) VERIFY the Smoothed A* cost vs a straight line in terminal output
-    verify_path_costs(smoothed_path, straight_line_grid, friction_map, height_img)
+    # 5) VERIFY the Final path cost vs a straight line in terminal output
+    verify_path_costs(final_path, straight_line_grid, friction_map, height_img)
 
     # 6) Build SDF world with visual markers for both paths
-    sdf = build_world_sdf(smoothed_path, straight_line_grid, height_img, friction_map)
+    sdf = build_world_sdf(final_path, straight_line_grid, height_img, friction_map)
     with open(OUTPUT_WORLD, "w") as f:
         f.write(sdf)
 

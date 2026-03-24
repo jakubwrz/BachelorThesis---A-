@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 import csv
+import random
 from PIL import Image
 import noise
 
 # Configuration constants
-IMG_SIZE = 129  # Adjust as needed
-NOISE_SCALE = 100  # Adjust as needed
-SEED = 12  # Adjust as needed
-MAX_HEIGHT = 1.0  # Adjust as needed
+IMG_SIZE = 129  
+NOISE_SCALE = 20.0 # Restored original scale for wavy hills
+SEED = 42
+MAX_HEIGHT = 4.0   # Kept at 4.0 to match your Gazebo world Z-height
 OUTPUT_TEXTURE = "terrain_texture.png"
 OUTPUT_HEIGHT_IMG = "heightmap.png"
 OUTPUT_FRICTION_CSV = "friction_map.csv"
@@ -15,41 +17,31 @@ OUTPUT_HEIGHT_CSV = "height_map.csv"
 
 def get_terrain_data(noise_value, terrain_type="mix"):
     """
-    Determine terrain color and friction based on noise value and terrain type.
-    
-    Args:
-        noise_value: Perlin noise value
-        terrain_type: Type of terrain ("friction", "hill", "mix")
-        
-    Returns:
-        Tuple of (color_rgb, friction_coefficient)
+    Determine terrain color and rolling resistance based on original thresholds
+    and updated Bosch handbook data.
     """
     if terrain_type == "mix":
+        # RESTORED ORIGINAL THRESHOLDS FOR THE "EARLIER" LOOK
         if noise_value < -0.05:
-            return (50, 50, 50), 0.013      # Asphalt (Dark gray, low friction)
+            # Concrete/Asphalt Entry
+            return (50, 50, 50), 0.008      # Asphalt (Dark gray, smooth)
         elif noise_value < 0.3:
-            return (34, 139, 34), 0.05      # Grass (Green, medium friction)
+            # Field (Tilled, medium) entry median
+            return (34, 139, 34), 0.20      # Grass (Green, median rolling resistance)
         else:
-            return (101, 67, 33), 0.35      # Mud (Brown, high friction)
+            # Field (Tilled, high/wet/loose) entry 
+            return (101, 67, 33), 0.35      # Mud (Brown, high rolling resistance)
             
     elif terrain_type == "friction":
-        # Handled dynamically in the main loop based on path
-        return (128, 128, 128), 0.5 
+        return (128, 128, 128), 0.008       # Placeholder (Handled in main loop)
         
     elif terrain_type == "hill":
-        # Handled dynamically in the main loop based on distance
-        return (128, 128, 128), 0.5
+        return (128, 128, 128), 0.05        # Placeholder (Handled in main loop)
 
 
 def generate_terrain(terrain_type="mix"):
     """
     Generate terrain maps based on the specified type.
-    
-    Args:
-        terrain_type: Type of terrain to generate ("friction", "hill", "mix")
-        
-    Returns:
-        Tuple of (friction_map, height_map_m, img_height)
     """
     if terrain_type not in ["friction", "hill", "mix"]:
         raise ValueError("terrain_type must be one of: 'friction', 'hill', 'mix'")
@@ -62,8 +54,10 @@ def generate_terrain(terrain_type="mix"):
     friction_map = []
     height_map_m = [] 
 
+    # Generate a random seed for this run so the map is unique every time!
+    current_seed = random.randint(0, 999999)
+
     if terrain_type == "mix":
-        # Original mixed terrain logic
         # 1st Pass: Generate noise and find the absolute min and max
         raw_noise = []
         min_h = float('inf')
@@ -72,21 +66,22 @@ def generate_terrain(terrain_type="mix"):
         for x in range(IMG_SIZE):
             row_raw = []
             for y in range(IMG_SIZE):
+                # Restored persistence and persistence octaves for the earlier feel
                 val_hgt = noise.pnoise2(x/NOISE_SCALE, y/NOISE_SCALE,
-                                        octaves=4, persistence=0.5, lacunarity=2.0, base=SEED+100)
+                                        octaves=4, persistence=0.5, lacunarity=2.0, base=current_seed+100)
                 row_raw.append(val_hgt)
                 if val_hgt < min_h: min_h = val_hgt
                 if val_hgt > max_h: max_h = val_hgt
             raw_noise.append(row_raw)
 
-        # 2nd Pass: Normalize and generate
+        # 2nd Pass: Normalize and apply Bosch data
         for x in range(IMG_SIZE):
             row_f = []
             row_h = []
             for y in range(IMG_SIZE):
-                # Texture & friction
+                # Texture & friction using original persistence octaves
                 val_tex = noise.pnoise2(x/NOISE_SCALE, y/NOISE_SCALE,
-                                        octaves=6, persistence=0.5, lacunarity=2.0, base=SEED)
+                                        octaves=6, persistence=0.5, lacunarity=2.0, base=current_seed)
                 color, friction = get_terrain_data(val_tex, terrain_type)
                 p_tex[x, y] = color
                 row_f.append(friction)
@@ -107,32 +102,28 @@ def generate_terrain(terrain_type="mix"):
             height_map_m.append(row_h)
             
     elif terrain_type == "friction":
-        # Flat terrain with friction path in the middle
-        path_width = IMG_SIZE // 8  # Path width
-        high_friction = 0.9
-        low_friction = 0.1
+        # Flat terrain with smooth asphalt path surrounded by thick field grass
+        path_width = IMG_SIZE // 8  
         
         for x in range(IMG_SIZE):
             row_f = []
             row_h = []
             for y in range(IMG_SIZE):
-                # Check if in the middle path (vertical strip)
                 in_path = abs(y - IMG_SIZE // 2) < path_width
-                friction = high_friction if in_path else low_friction
                 
-                # Color based on friction
                 if in_path:
-                    color = (50, 50, 50)       # Dark gray (Asphalt)
+                    color = (50, 50, 50)       # Asphalt (Bosch: Concrete/Asphalt)
+                    friction = 0.008           
                 else:
-                    color = (176, 224, 230)    # Light blue (Ice)
+                    color = (34, 139, 34)      # Field (Bosch: Field)
+                    friction = 0.20            
                     
                 p_tex[x, y] = color
                 row_f.append(friction)
                 
                 # Flat height
                 physical_h_m = 0.0
-                px = 0
-                p_hgt[x, y] = px
+                p_hgt[x, y] = 0
                 row_h.append(physical_h_m)
                 
             friction_map.append(row_f)
@@ -142,7 +133,7 @@ def generate_terrain(terrain_type="mix"):
         p_hgt[0, 0] = 1 
         
     elif terrain_type == "hill":
-        # Flat friction with hill in the middle
+        # Flat grass plain with an smooth mud hill in the middle (testing slope vs mud)
         hill_radius = IMG_SIZE // 4
         hill_height = MAX_HEIGHT
         
@@ -150,19 +141,17 @@ def generate_terrain(terrain_type="mix"):
             row_f = []
             row_h = []
             for y in range(IMG_SIZE):
-                # Constant friction
-                friction = 0.5
-                
-                # Hill in the center
                 center_x, center_y = IMG_SIZE // 2, IMG_SIZE // 2
                 distance = ((x - center_x) ** 2 + (y - center_y) ** 2) ** 0.5
                 
                 if distance <= hill_radius:
-                    color = (101, 67, 33)   # Brown (Rock/Dirt) for the hill
+                    color = (101, 67, 33)   # Mud (Bosch: Field, high entry)
+                    friction = 0.35         
                     height_factor = 1 - (distance / hill_radius) ** 2
                     physical_h_m = height_factor * hill_height
                 else:
-                    color = (34, 139, 34)   # Green (Grass) for the flat ground
+                    color = (34, 139, 34)   # Grass (Bosch: Field, median entry)
+                    friction = 0.20         
                     physical_h_m = 0.0
                     
                 p_tex[x, y] = color
