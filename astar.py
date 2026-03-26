@@ -3,6 +3,7 @@ import os
 import csv
 import math
 import random
+import time
 
 from PIL import Image
 
@@ -51,7 +52,54 @@ OUTPUT_TEXTURE      = os.path.join(CURRENT_DIR, "terrain_texture.png")
 OUTPUT_HEIGHT_IMG   = os.path.join(CURRENT_DIR, "heightmap.png")  
 OUTPUT_WORLD        = os.path.join(CURRENT_DIR, "thesis_3d_path.world")
 
-
+def calculate_path_metrics(path, height_img, timing_data):
+    """Calculates and prints physical and performance metrics for the final path."""
+    print("\n--- PATH METRICS ---")
+    print(f"A* Search Time:           {timing_data['astar']:.4f} seconds")
+    print(f"LOS Smoothing Time:       {timing_data['smooth']:.4f} seconds")
+    print(f"Rubberband Opt. Time:     {timing_data['opt']:.4f} seconds")
+    print(f"Total Planning Time:      {timing_data['total']:.4f} seconds")
+    
+    total_dist_2d = 0.0
+    total_dist_3d = 0.0
+    min_z = float('inf')
+    max_z = float('-inf')
+    max_step_dz = 0.0
+    pos_z_for_sdf = (MAX_HEIGHT / 2.0) if HEIGHTMAP_BOTTOM_ALIGNED else 0.0
+    
+    for i in range(len(path)):
+        cx, cy = path[i]
+        wx, wy = world_xy_from_grid(cx, cy)
+        cz = terrain_z_from_world_xy(wx, wy, height_img, MAX_HEIGHT, pos_z_for_sdf, HEIGHTMAP_BOTTOM_ALIGNED)
+        
+        # Track highest and lowest points
+        if cz < min_z: min_z = cz
+        if cz > max_z: max_z = cz
+        
+        # Calculate distances and steps between consecutive nodes
+        if i > 0:
+            px, py = path[i-1]
+            pwx, pwy = world_xy_from_grid(px, py)
+            pz = terrain_z_from_world_xy(pwx, pwy, height_img, MAX_HEIGHT, pos_z_for_sdf, HEIGHTMAP_BOTTOM_ALIGNED)
+            
+            dist2d = math.hypot(wx - pwx, wy - pwy)
+            total_dist_2d += dist2d
+            
+            dz = cz - pz
+            total_dist_3d += math.hypot(dist2d, dz)
+            
+            if abs(dz) > max_step_dz:
+                max_step_dz = abs(dz)
+                
+    overall_elev_change = max_z - min_z
+    
+    print(f"Total Path Distance (2D): {total_dist_2d:.2f} meters")
+    print(f"Total Path Distance (3D): {total_dist_3d:.2f} meters")
+    print(f"Minimum Elevation:        {min_z:.2f} meters")
+    print(f"Maximum Elevation:        {max_z:.2f} meters")
+    print(f"Overall Elevation Span:   {overall_elev_change:.2f} meters")
+    print(f"Steepest Single Step:     {max_step_dz:.2f} meters")
+    print("--------------------\n")
 # -----------------------------
 # 2) PATH VERIFICATION & SMOOTHING TOOLS
 # -----------------------------
@@ -560,9 +608,6 @@ def build_world_sdf(final_path, straight_path_grid, height_img: Image.Image, fri
             "".join(road_models) + "".join(straight_line_models) + world_footer)
 
 
-# -----------------------------
-# 7) MAIN
-# -----------------------------
 def main():
     print(f"Truly Randomized Start: {START}, Goal: {GOAL}")
 
@@ -572,7 +617,10 @@ def main():
     friction_map, height_map, height_img = generate_terrain(map_type)
     
     # 2) Plan RAW A* path on image heights (meters)
+    t0 = time.time()  # Start timer
     raw_path = run_astar(friction_map, height_img)
+    t1 = time.time()  # A* finished
+    
     if not raw_path:
         print("NO PATH FOUND.")
         return
@@ -580,15 +628,26 @@ def main():
 
     # 3) SMOOTH THE PATH (Cost-Aware String-Pulling)
     smoothed_path = smooth_path_los(raw_path, friction_map, height_img)
+    t2 = time.time()  # Smoothing finished
     
     # NEW: Pull the string tight against the obstacles!
     final_path = optimize_path_rubberband(smoothed_path, friction_map, height_img)
+    t3 = time.time()  # Rubberband finished
 
     # 4) Generate mathematically direct line grid coordinates early for use in Verify and Build
     straight_line_grid = get_bresenham_line(final_path[0][0], final_path[0][1], final_path[-1][0], final_path[-1][1])
 
     # 5) VERIFY the Final path cost vs a straight line in terminal output
     verify_path_costs(final_path, straight_line_grid, friction_map, height_img)
+
+    # ---> NEW: Calculate and Display Metrics <---
+    timing_data = {
+        'astar': t1 - t0,
+        'smooth': t2 - t1,
+        'opt': t3 - t2,
+        'total': t3 - t0
+    }
+    calculate_path_metrics(final_path, height_img, timing_data)
 
     # 6) Build SDF world with visual markers for both paths
     sdf = build_world_sdf(final_path, straight_line_grid, height_img, friction_map)
