@@ -29,10 +29,10 @@ class Config:
         self.RESAMPLE_STEP_M = 0.30
         self.ADD_DEBUG_PINS = False
         self.PIN_EVERY_N = 8
-        self.START = (random.randrange(5, 90), random.randrange(5, 90))
+        self.START = (random.randrange(5, 60), random.randrange(5, 60))
         self.GOAL = (115, 115)
         self.MIN_FRICTION = 0.008 
-        self.MAX_SLOPE = 0.5
+        self.MAX_SLOPE = 1.0
         self.CURRENT_DIR = os.getcwd()
         self.OUTPUT_TEXTURE = os.path.join(self.CURRENT_DIR, "terrain_texture.png")
         self.OUTPUT_HEIGHT_IMG = os.path.join(self.CURRENT_DIR, "heightmap.png")
@@ -431,221 +431,257 @@ class WorldBuilder:
         return dense
 
     def build_world_sdf(self, final_path, straight_path_grid, normal_path, dijkstra_path):
-        HEIGHT_URI = "file://" + os.path.abspath(self.config.OUTPUT_HEIGHT_IMG)
-        TEX_URI    = "file://" + os.path.abspath(self.config.OUTPUT_TEXTURE)
+        import os
 
+        HEIGHT_URI = "file://" + os.path.abspath(self.config.OUTPUT_HEIGHT_IMG)
+        TEX_URI = "file://" + os.path.abspath(self.config.OUTPUT_TEXTURE)
         pos_z_for_sdf = (self.config.MAX_HEIGHT / 2.0) if self.config.HEIGHTMAP_BOTTOM_ALIGNED else 0.0
 
-        world_header = """<?xml version="1.0" ?>
-<sdf version="1.5">
-  <world name="default">
-    <include><uri>model://sun</uri></include>
-    <scene><ambient>0.6 0.6 0.6 1</ambient><shadows>true</shadows><grid>false</grid></scene>
-"""
+        # ------------------------------------------------------
+        # 1) EXPORT WAYPOINTS FOR ROBOT MOVEMENT
+        # ------------------------------------------------------
+        dense_pts = self.resample_polyline_world(final_path, self.config.RESAMPLE_STEP_M)
+        with open("waypoints.csv", "w") as f:
+            for (wx, wy, wz) in dense_pts:
+                f.write(f"{wx},{wy},{wz}\n")
+
+        # ------------------------------------------------------
+        # 2) BUILD WORLD HEADER
+        # ------------------------------------------------------
+        world_header = f"""<?xml version="1.0" ?>
+    <sdf version="1.5">
+    <world name="default">
+        <include><uri>model://sun</uri></include>
+        <scene>
+        <ambient>0.6 0.6 0.6 1</ambient>
+        <shadows>true</shadows>
+        <grid>false</grid>
+        </scene>
+    """
+
         if not self.config.REMOVE_GROUND_PLANE:
             world_header += '    <include><uri>model://ground_plane</uri></include>\n'
 
+        # ------------------------------------------------------
+        # 3) TERRAIN HEIGHTMAP MODEL
+        # ------------------------------------------------------
         terrain_model = f"""
-    <model name="thesis_terrain">
-      <static>true</static>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <heightmap>
-              <uri>{HEIGHT_URI}</uri>
-              <size>{self.config.REAL_SIZE} {self.config.REAL_SIZE} {self.config.MAX_HEIGHT}</size>
-              <pos>0 0 {pos_z_for_sdf}</pos>
-            </heightmap>
-          </geometry>
-          <surface>
-            <friction>
-              <ode><mu>100</mu><mu2>50</mu2></ode>
-            </friction>
-          </surface>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <heightmap>
-              <use_terrain_paging>false</use_terrain_paging>
-              <texture>
-                <diffuse>{TEX_URI}</diffuse>
-                <normal>file://media/materials/textures/flat_normal.png</normal>
-                <size>{self.config.REAL_SIZE}</size>
-              </texture>
-              <uri>{HEIGHT_URI}</uri>
-              <size>{self.config.REAL_SIZE} {self.config.REAL_SIZE} {self.config.MAX_HEIGHT}</size>
-              <pos>0 0 {pos_z_for_sdf}</pos>
-            </heightmap>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-"""
+        <model name="thesis_terrain">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision">
+            <geometry>
+                <heightmap>
+                <uri>{HEIGHT_URI}</uri>
+                <size>{self.config.REAL_SIZE} {self.config.REAL_SIZE} {self.config.MAX_HEIGHT}</size>
+                <pos>0 0 {pos_z_for_sdf}</pos>
+                </heightmap>
+            </geometry>
+            <surface>
+                <friction>
+                <ode><mu>100</mu><mu2>50</mu2></ode>
+                </friction>
+            </surface>
+            </collision>
 
+            <visual name="visual">
+            <geometry>
+                <heightmap>
+                <use_terrain_paging>false</use_terrain_paging>
+                <texture>
+                    <diffuse>{TEX_URI}</diffuse>
+                    <normal>file://media/materials/textures/flat_normal.png</normal>
+                    <size>{self.config.REAL_SIZE}</size>
+                </texture>
+                <uri>{HEIGHT_URI}</uri>
+                <size>{self.config.REAL_SIZE} {self.config.REAL_SIZE} {self.config.MAX_HEIGHT}</size>
+                <pos>0 0 {pos_z_for_sdf}</pos>
+                </heightmap>
+            </geometry>
+            </visual>
+        </link>
+        </model>
+    """
+
+        # ------------------------------------------------------
+        # 4) SPAWN START & GOAL MARKERS
+        # ------------------------------------------------------
         sx, sy = final_path[0]
         gx, gy = final_path[-1]
         sxw, syw = self.terrain.world_xy_from_grid(sx, sy)
         gxw, gyw = self.terrain.world_xy_from_grid(gx, gy)
-
         sz = self.terrain.terrain_z_from_world_xy(sxw, syw)
         gz = self.terrain.terrain_z_from_world_xy(gxw, gyw)
 
-        start_model = f"""
-    <model name="start_marker">
-      <static>true</static>
-      <pose>{sxw} {syw} {sz + self.config.HOVER_HEIGHT + 0.25} 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><cylinder><radius>0.4</radius><length>0.5</length></cylinder></geometry>
-          <material><ambient>0 1 1 1</ambient><diffuse>0 1 1 1</diffuse><emissive>0 1 1 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-"""
-        goal_model = f"""
-    <model name="goal_marker">
-      <static>true</static>
-      <pose>{gxw} {gyw} {gz + self.config.HOVER_HEIGHT + 0.25} 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><cylinder><radius>0.4</radius><length>0.5</length></cylinder></geometry>
-          <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse><emissive>1 0 0 1</emissive></material>
-        </visual>
-      </link>
-    </model>
-"""
+        start_marker = f"""
+        <model name="start_marker">
+        <static>true</static>
+        <pose>{sxw} {syw} {sz + self.config.HOVER_HEIGHT + 0.25} 0 0 0</pose>
+        <link name="link">
+            <visual name="visual">
+            <geometry><cylinder><radius>0.4</radius><length>0.5</length></cylinder></geometry>
+            <material><ambient>0 1 1 1</ambient><diffuse>0 1 1 1</diffuse><emissive>0 1 1 1</emissive></material>
+            </visual>
+        </link>
+        </model>
+    """
 
-        dense_pts = self.resample_polyline_world(final_path, self.config.RESAMPLE_STEP_M)
+        goal_marker = f"""
+        <model name="goal_marker">
+        <static>true</static>
+        <pose>{gxw} {gyw} {gz + self.config.HOVER_HEIGHT + 0.25} 0 0 0</pose>
+        <link name="link">
+            <visual name="visual">
+            <geometry><cylinder><radius>0.4</radius><length>0.5</length></cylinder></geometry>
+            <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse><emissive>1 0 0 1</emissive></material>
+            </visual>
+        </link>
+        </model>
+    """
+
         road_models = []
-
         for i in range(len(dense_pts) - 1):
-            x1g, y1g, z1g = dense_pts[i]
-            x2g, y2g, z2g = dense_pts[i + 1]
+            x1, y1, z1 = dense_pts[i]
+            x2, y2, z2 = dense_pts[i+1]
 
-            mid_x = (x1g + x2g) / 2.0
-            mid_y = (y1g + y2g) / 2.0
-            mid_z = (z1g + z2g) / 2.0 + self.config.HOVER_HEIGHT + (self.config.ROAD_THICKNESS / 2.0)
+            mid_x = (x1 + x2) / 2
+            mid_y = (y1 + y2) / 2
+            mid_z = (z1 + z2) / 2 + self.config.HOVER_HEIGHT + self.config.ROAD_THICKNESS / 2
 
-            gx_grid, gy_grid = self.terrain.world_xy_to_grid(mid_x, mid_y)
-            mu = self.terrain.friction_map[gx_grid][gy_grid]
-            
-            dx = x2g - x1g
-            dy = y2g - y1g
-            dz = z2g - z1g
+            dx = x2 - x1
+            dy = y2 - y1
+            dz = z2 - z1
 
-            dist_2d = math.hypot(dx, dy)
-            length = math.hypot(dist_2d, dz)
-            yaw   = math.atan2(dy, dx)
-            pitch = -math.atan2(dz, dist_2d) if dist_2d > 1e-6 else 0.0
+            dist2d = math.hypot(dx, dy)
+            length = math.hypot(dist2d, dz)
+            yaw = math.atan2(dy, dx)
+            pitch = -math.atan2(dz, dist2d) if dist2d > 1e-6 else 0
+
+            gxg, gyg = self.terrain.world_xy_to_grid(mid_x, mid_y)
+            mu = self.terrain.friction_map[gxg][gyg]
 
             road_models.append(f"""
-    <model name="road_segment_{i}">
-      <static>true</static>
-      <pose>{mid_x} {mid_y} {mid_z} 0 {pitch} {yaw}</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry><box><size>{length} {self.config.ROAD_WIDTH} {self.config.ROAD_THICKNESS}</size></box></geometry>
-          <surface>
-            <friction>
-              <ode><mu>{mu}</mu><mu2>{mu}</mu2></ode>
-            </friction>
-          </surface>
-        </collision>
-        <visual name="visual">
-          <geometry><box><size>{length} {self.config.ROAD_WIDTH} {self.config.ROAD_THICKNESS}</size></box></geometry>
-          <material>
-            <ambient>1 1 0 1</ambient> <diffuse>1 1 0 1</diffuse>
-            <emissive>1 1 0 1</emissive>
-          </material>
-        </visual>
-      </link>
-    </model>
-""")
+        <model name="road_segment_{i}">
+        <static>true</static>
+        <pose>{mid_x} {mid_y} {mid_z} 0 {pitch} {yaw}</pose>
+        <link name="link">
+            <collision name="collision">
+            <geometry><box><size>{length} {self.config.ROAD_WIDTH} {self.config.ROAD_THICKNESS}</size></box></geometry>
+            <surface><friction><ode><mu>{mu}</mu><mu2>{mu}</mu2></ode></friction></surface>
+            </collision>
 
-        dense_straight_pts = self.resample_polyline_world(straight_path_grid, 0.5)
-        straight_line_models = []
-        
-        for j, (wx, wy, wz) in enumerate(dense_straight_pts):
-            straight_line_models.append(f"""
-    <model name="straight_marker_{j}">
-      <static>true</static>
-      <pose>{wx} {wy} {wz + 0.1} 0 0 0</pose>
-      <link name="link">
-        <visual name="visual">
-          <geometry><sphere><radius>0.05</radius></sphere></geometry>
-          <material>
-            <ambient>1 0 1 1</ambient> <diffuse>1 0 1 1</diffuse>
-            <emissive>1 0 1 1</emissive>
-          </material>
-        </visual>
-      </link>
-    </model>
-""")
+            <visual name="visual">
+            <geometry><box><size>{length} {self.config.ROAD_WIDTH} {self.config.ROAD_THICKNESS}</size></box></geometry>
+            <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse><emissive>1 1 0 1</emissive></material>
+            </visual>
+        </link>
+        </model>
+    """)
+
+        dense_straight = self.resample_polyline_world(straight_path_grid, 0.5)
+        straight_models = []
+        for j, (wx, wy, wz) in enumerate(dense_straight):
+            straight_models.append(f"""
+        <model name="straight_marker_{j}">
+        <static>true</static>
+        <pose>{wx} {wy} {wz + 0.1} 0 0 0</pose>
+        <link name="link">
+            <visual name="visual">
+            <geometry><sphere><radius>0.05</radius></sphere></geometry>
+            <material><ambient>1 0 1 1</ambient><diffuse>1 0 1 1</diffuse><emissive>1 0 1 1</emissive></material>
+            </visual>
+        </link>
+        </model>
+    """)
 
         normal_models = []
         if normal_path:
-            dense_normal_pts = self.resample_polyline_world(normal_path, self.config.RESAMPLE_STEP_M)
-            for i in range(len(dense_normal_pts) - 1):
-                x1g, y1g, z1g = dense_normal_pts[i]
-                x2g, y2g, z2g = dense_normal_pts[i + 1]
-
-                mid_x = (x1g + x2g) / 2.0
-                mid_y = (y1g + y2g) / 2.0
-                mid_z = (z1g + z2g) / 2.0 + self.config.HOVER_HEIGHT + 0.1 + (self.config.ROAD_THICKNESS / 4.0)
-                
-                dx = x2g - x1g
-                dy = y2g - y1g
-                dz = z2g - z1g
-
-                dist_2d = math.hypot(dx, dy)
-                length = math.hypot(dist_2d, dz)
-                yaw   = math.atan2(dy, dx)
-                pitch = -math.atan2(dz, dist_2d) if dist_2d > 1e-6 else 0.0
+            dense_normal = self.resample_polyline_world(normal_path, self.config.RESAMPLE_STEP_M)
+            for i in range(len(dense_normal) - 1):
+                x1, y1, z1 = dense_normal[i]
+                x2, y2, z2 = dense_normal[i+1]
+                mid_x = (x1 + x2)/2
+                mid_y = (y1 + y2)/2
+                mid_z = (z1 + z2)/2 + self.config.HOVER_HEIGHT + 0.1 + (self.config.ROAD_THICKNESS/4)
+                dx = x2 - x1
+                dy = y2 - y1
+                dz = z2 - z1
+                dist2d = math.hypot(dx, dy)
+                length = math.hypot(dist2d, dz)
+                yaw = math.atan2(dy, dx)
+                pitch = -math.atan2(dz, dist2d) if dist2d > 1e-6 else 0
 
                 normal_models.append(f"""
         <model name="normal_astar_segment_{i}">
-          <static>true</static>
-          <pose>{mid_x} {mid_y} {mid_z} 0 {pitch} {yaw}</pose>
-          <link name="link">
+        <static>true</static>
+        <pose>{mid_x} {mid_y} {mid_z} 0 {pitch} {yaw}</pose>
+        <link name="link">
             <visual name="visual">
-              <geometry><box><size>{length} {self.config.ROAD_WIDTH * 0.5} {self.config.ROAD_THICKNESS * 0.5}</size></box></geometry>
-              <material>
-                <ambient>0 1 1 1</ambient> <diffuse>0 1 1 1</diffuse>
-                <emissive>0 1 1 1</emissive>
-              </material>
+            <geometry><box><size>{length} {self.config.ROAD_WIDTH * 0.5} {self.config.ROAD_THICKNESS * 0.5}</size></box></geometry>
+            <material><ambient>0 1 1 1</ambient><diffuse>0 1 1 1</diffuse><emissive>0 1 1 1</emissive></material>
             </visual>
-          </link>
+        </link>
         </model>
     """)
 
+        # Dijkstra markers
         dijkstra_models = []
         if dijkstra_path:
-            dense_dijkstra_pts = self.resample_polyline_world(dijkstra_path, 0.5)
-            for j, (wx, wy, wz) in enumerate(dense_dijkstra_pts):
+            dense_dij = self.resample_polyline_world(dijkstra_path, 0.5)
+            for j, (wx, wy, wz) in enumerate(dense_dij):
                 dijkstra_models.append(f"""
         <model name="dijkstra_marker_{j}">
-          <static>true</static>
-          <pose>{wx} {wy} {wz + 0.15} 0 0 0</pose>
-          <link name="link">
+        <static>true</static>
+        <pose>{wx} {wy} {wz + 0.15} 0 0 0</pose>
+        <link name="link">
             <visual name="visual">
-              <geometry><sphere><radius>0.08</radius></sphere></geometry>
-              <material>
-                <ambient>0 0 1 1</ambient> <diffuse>0 0 1 1</diffuse>
-                <emissive>0 0 1 1</emissive>
-              </material>
+            <geometry><sphere><radius>0.08</radius></sphere></geometry>
+            <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse><emissive>0 0 1 1</emissive></material>
             </visual>
-          </link>
+        </link>
         </model>
     """)
 
-        world_footer = """
-  </world>
-</sdf>
-"""
-        return (world_header + terrain_model + start_model + goal_model + 
-                "".join(road_models) + "".join(straight_line_models) + 
-                "".join(normal_models) + "".join(dijkstra_models) + world_footer)
+        robot_model = f"""
+            <model name="robot">
+            <pose>{sxw} {syw} {sz + 0.3} 0 0 0</pose>
 
+            <link name="base">
+                <inertial><mass>5</mass></inertial>
+
+                <collision name="col">
+                <geometry><sphere><radius>0.25</radius></sphere></geometry>
+                </collision>
+
+                <visual name="vis">
+                <geometry><sphere><radius>0.25</radius></sphere></geometry>
+                <material><ambient>0 0 1 1</ambient></material>
+                </visual>
+            </link>
+
+            <plugin name="waypoint_follower" filename="libwaypoint_follower.so">
+                <waypoints_file>waypoints.csv</waypoints_file>
+            </plugin>
+            </model>
+        """
+
+        world_footer = """
+    </world>
+    </sdf>
+    """
+
+        return (
+            world_header
+            + terrain_model
+            + start_marker
+            + goal_marker
+            + "".join(road_models)
+            + "".join(straight_models)
+            + "".join(normal_models)
+            + "".join(dijkstra_models)
+            + robot_model
+            + world_footer
+        )
 class StandardAStarPlanner:
     def __init__(self, config, terrain):
         self.config = config
@@ -757,7 +793,6 @@ class DijkstraPlanner:
                     counter += 1
                     heapq.heappush(open_list, (f_score[(nx, ny)], counter, (nx, ny)))
         return []
-# -----------------------------
 
 def main():
     config = Config()
@@ -765,7 +800,7 @@ def main():
 
     map_type = input("Enter scenario type (mix/friction/hill): ").strip().lower()
 
-    # 1) Generate terrain maps using separate module
+    # Generating map
     friction_map, height_map, height_img = generate_terrain(map_type)
     
     terrain = Terrain(config, height_img, friction_map)
@@ -774,7 +809,7 @@ def main():
     metrics = MetricsCalculator(config, terrain)
     builder = WorldBuilder(config, terrain)
     
-    # 2) Plan RAW A* path on image heights (meters)
+    # Plan RAW A* path on image heights (metres)
     t0 = time.time()  # Start timer
     raw_path = planner.run_astar()
     t1 = time.time()  # A* finished
@@ -784,21 +819,21 @@ def main():
         return
     print(f"Path length (raw grid nodes): {len(raw_path)}")
 
-    # 3) SMOOTH THE PATH (Cost-Aware String-Pulling)
+    # SMOOTH THE PATH (Cost-Aware String-Pulling)
     smoothed_path = processor.smooth_path_los(raw_path)
     t2 = time.time()  # Smoothing finished
     
-    # NEW: Pull the string tight against the obstacles!
+    # Pull the string tight against the obstacles
     final_path = processor.optimize_path_rubberband(smoothed_path)
     t3 = time.time()  # Rubberband finished
 
-    # 4) Generate mathematically direct line grid coordinates early for use in Verify and Build
+    # Generate mathematically direct line grid coordinates early for use in Verify and Build
     straight_line_grid = processor.get_bresenham_line(final_path[0][0], final_path[0][1], final_path[-1][0], final_path[-1][1])
 
-    # 5) VERIFY the Final path cost vs a straight line in terminal output
+    #verify the Final path cost vs a straight line in terminal output
     metrics.verify_path_costs(final_path, straight_line_grid)
 
-    # ---> NEW: Calculate and Display Metrics <---
+    # Calculate and Display Metrics <---
     timing_data = {
         'astar': t1 - t0,
         'smooth': t2 - t1,
@@ -836,7 +871,7 @@ def main():
     raw_dijkstra_path = dijkstra_planner.run_dijkstra()
     t_d1 = time.time()
     
-    # Smooth and optimize the Dijkstra path!
+    # Smooth and optimize the Dijkstra path
     smooth_dijkstra_path = processor.smooth_path_los(raw_dijkstra_path)
     t_d2 = time.time()
     

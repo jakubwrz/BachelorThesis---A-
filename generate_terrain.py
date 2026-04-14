@@ -40,7 +40,7 @@ def get_terrain_data(noise_value, terrain_type="mix"):
 
 
 def generate_terrain(terrain_type="mix"):
-    """
+    """=
     Generate terrain maps based on the specified type.
     """
     if terrain_type not in ["friction", "hill", "mix"]:

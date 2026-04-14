@@ -1,0 +1,3 @@
+/home/user/BachelorThesis---A-/plugin_waypoint/build/CMakeFiles/waypoint_follower.dir
+/home/user/BachelorThesis---A-/plugin_waypoint/build/CMakeFiles/edit_cache.dir
+/home/user/BachelorThesis---A-/plugin_waypoint/build/CMakeFiles/rebuild_cache.dir
